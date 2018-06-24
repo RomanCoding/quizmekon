@@ -11,10 +11,17 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/posts', 'PostController@index');
+Route::get('/posts/{post}', 'PostController@show');
+
+Route::get('/comments/{post}', 'CommentController@index');
+Route::post('/comments/post/{post}', 'CommentController@storePost');
+Route::post('/comments/comment/{comment}', 'CommentController@storeComment');
+Route::patch('/posts/{post}/vote', 'VoteController@update');
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/', 'HomeController@index')->name('home');
+Route::get('/sessionStatus', function() {
+    return ['user' => Auth::user() ? Auth::user() : null];
+});

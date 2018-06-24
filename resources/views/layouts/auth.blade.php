@@ -25,8 +25,12 @@
 <div id="app">
     <site-header></site-header>
 
-    <div class="container-fluid">
-        @yield('content')
+    <div class="container">
+        <div class="columns is-centered">
+            <div class="column is-12">
+                @yield('content')
+            </div>
+        </div>
     </div>
 </div>
 </body>
