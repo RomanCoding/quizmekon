@@ -38,7 +38,7 @@
         </div>
         <footer class="card-footer">
             <div class="columns is-multiline">
-                <div class="column is-12">
+                <div class="column is-12 comments">
                     <b-input type="textarea" size="is-small" rows="4" placeholder="What are your thoughts?"
                              v-model="postComment"></b-input>
                     <button class="button is-primary is-small is-pulled-right" @click="commentPost">
@@ -94,42 +94,38 @@
                 axios.post('/comments/post/' + this.post.id, {
                     body: this.postComment
                 }).then((r) => {
-                    self.post.comments.push(r.data);
+                    self.post.comments.unshift(r.data);
+                    self.postComment = '';
                 }).catch((e) => {
-                    alert('Error commenting!');
+                    switch (e.response.status) {
+                        case 400: {
+                            self.$toast.open({
+                                duration: 5000,
+                                message: e.response.data.message,
+                                position: 'is-top',
+                                type: 'is-danger'
+                            });
+                            break;
+                        }
+                        default: {
+                            alert('Error');
+                        }
+                    }
                 });
             },
             upvote() {
-                let self = this;
-                this.$emit('upvotePost');
-                axios.patch('/posts/' + this.post.id + '/vote', {
-                    up: 1
-                }).then((r) => {
-                    if (self.post.usersVote.updated_at !== r.data.updated_at) {
-                        self.post.votesTotal++;
-                    }
-                    self.post.usersVote = r.data;
-                }).catch((e) => {
-
-                });
+                this.$emit('upvotePost', this.post);
             },
             downvote() {
-                let self = this;
-                axios.patch('/posts/' + this.post.id + '/vote')
-                    .then((r) => {
-                        if (self.post.usersVote.updated_at !== r.data.updated_at) {
-                            self.post.votesTotal--;
-                        }
-                        self.post.usersVote = r.data;
-                    })
-                    .catch((e) => {
-
-                    });
+                this.$emit('downvotePost', this.post);
             },
         }
     }
 </script>
 <style scoped lang="scss">
+    .card-footer .comments {
+        padding-bottom: 2rem;
+    }
     .vote-buttons div {
         padding-left: 2px;
         padding-right: 2px;

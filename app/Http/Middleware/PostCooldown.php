@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
-class CommentCooldown
+class PostCooldown
 {
     /**
      * Handle an incoming request.
@@ -18,12 +18,12 @@ class CommentCooldown
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        if ($request->user('web')->comments()->inFiveMinutes()->count()) {
+        if ($request->user('web')->posts()->inSevenMinutes()->count()) {
             return response()->json([
-                'message' => 'Wait ' . (300 - Carbon::now()
-                        ->diffInSeconds(Carbon::parse(
-                            $request->user('web')->comments()->first()->created_at)
-                        )) . ' seconds to comment!'
+                'message' => 'Wait ' . (420 - Carbon::now()
+                            ->diffInSeconds(Carbon::parse(
+                                $request->user('web')->posts()->first()->created_at)
+                            )) . ' seconds to post!'
             ], 400);
         }
 

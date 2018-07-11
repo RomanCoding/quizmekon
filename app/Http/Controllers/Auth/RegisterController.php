@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Jobs\SendVerificationEmail;
 use App\User;
 use App\Http\Controllers\Controller;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -37,7 +40,7 @@ class RegisterController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('guest');
+        $this->middleware('guest')->except('verify');
     }
 
     /**
@@ -49,7 +52,7 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'username' => 'required|string|max:255',
+            'username' => 'required|string|max:40',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
         ]);
@@ -67,6 +70,62 @@ class RegisterController extends Controller
             'username' => $data['username'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'email_token' => base64_encode($data['email'])
         ]);
+    }
+
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function register(Request $request)
+    {
+        $this->validator($request->all())->validate();
+        event(new Registered($user = $this->create($request->all())));
+        dispatch(new SendVerificationEmail($user));
+        return view('verification');
+    }
+
+    /**
+     * Check if a user specified unique email.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function checkUniqueEmail(Request $request)
+    {
+        $this->validate($request, [
+            'email' => 'required|email|unique:users,email'
+        ]);
+        return response()->json(200);
+    }
+
+    /**
+     * Check if a user specified unique email.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function checkUniqueUsername(Request $request)
+    {
+        $this->validate($request, [
+            'username' => 'required|string|min:5|max:40|unique:users,username'
+        ]);
+        return response()->json(200);
+    }
+
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param $token
+     * @return \Illuminate\Http\Response
+     */
+    public function verify($token)
+    {
+        $user = User::where('email_token', $token)->first();
+        $user->verify();
+        return redirect()->home();
     }
 }

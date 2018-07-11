@@ -15,7 +15,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'username', 'email', 'password',
+        'username', 'email', 'password', 'email_token'
     ];
 
     /**
@@ -35,5 +35,34 @@ class User extends Authenticatable
             'user_id' => $this->id,
             'value' => $vote
         ]);
+    }
+
+    public function voteForComment(Comment $comment, $vote = -1)
+    {
+        return $comment->votes()->updateOrCreate([
+            'user_id' => $this->id,
+        ], [
+            'user_id' => $this->id,
+            'value' => $vote
+        ]);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class)->orderByDesc('id');
+    }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class)->orderByDesc('id');
+    }
+
+    /**
+     * Mark user as verified.
+     */
+    public function verify()
+    {
+        $this->confirmed = 1;
+        $this->save();
     }
 }

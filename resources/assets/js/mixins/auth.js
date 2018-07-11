@@ -5,9 +5,11 @@ let authMixin = {
             return new Promise((resolve, reject) => {
                 axios.get('/sessionStatus')
                     .then(response => {
+                        window.user = response.data.user;
                         resolve(response.data.user);
                     })
                     .catch(error => {
+                        window.user = null;
                         reject(error.response.data);
                     });
             });

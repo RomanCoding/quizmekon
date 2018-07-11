@@ -2,6 +2,9 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\CommentCooldown;
+use App\Http\Middleware\EmailConfirmed;
+use App\Http\Middleware\PostCooldown;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -59,5 +62,8 @@ class Kernel extends HttpKernel
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+        'cd.comment' => CommentCooldown::class,
+        'cd.post' => PostCooldown::class,
+        'confirmed' => EmailConfirmed::class
     ];
 }

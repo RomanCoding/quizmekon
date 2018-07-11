@@ -2,12 +2,15 @@
     <div class="card" v-if="!this.expand">
         <header class="card-header is-mobile columns is-gapless">
             <div class="column is-three-fifths-mobile is-two-thirds-tablet is-half-desktop is-one-third-widescreen is-one-quarter-fullhd">
-                <p class="card-header-title" v-text="post.title" @click="$emit('expanded')"></p>
+                <p :class="{'card-header-title':true, 'is-paddingless': post.type == 2}" @click="$emit('expanded')">
+                    <img v-if="post.type == 2" :src="ytThumnnail" alt="">
+                    {{ post.title }}
+                </p>
             </div>
             <div class="column is-gapless">
 
                 <div class="vote-buttons is-pulled-right">
-                    <span class="tag is-light" v-text="post.category.name"></span>
+                    <span class="tag is-light pointer" v-text="post.category.name" @click="visitCategory"></span>
                     <div class="is-pulled-right">
                         <font-awesome-icon :style="upArrow" @click="upvote" icon="arrow-circle-up"/>
                         <span>
@@ -18,53 +21,10 @@
                 </div>
             </div>
         </header>
-        <!--<div class="card-content">-->
-
-        <!--<div class="is-11">-->
-        <!--<div class="content is-clearfix">-->
-        <!--{{ post.body }}-->
-        <!--<a href="#">@bulmaio</a>. <a href="#">#css</a> <a href="#">#responsive</a>-->
-        <!--<br>-->
-        <!--<time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>-->
-        <!--</div>-->
-        <!--</div>-->
-        <!--</div>-->
-        <!--<footer class="card-footer">-->
-        <!--<a href="#" class="card-footer-item">Save</a>-->
-        <!--<a href="#" class="card-footer-item">Edit</a>-->
-        <!--<a href="#" class="card-footer-item">Delete</a>-->
-        <!--</footer>-->
+        <footer class="card-footer">
+            <span @click="$emit('expanded')"><font-awesome-icon size="xs" icon="comment-alt"/> {{ post.comments_count || 0 }} comments</span>
+        </footer>
     </div>
-    <!--<div class="card">-->
-    <!--<header class="card-header is-mobile columns is-gapless">-->
-    <!--<div class="column is-11">-->
-    <!--<p class="card-header-title" v-text="post.title"></p>-->
-    <!--</div>-->
-    <!--<div class="column">-->
-    <!--<div class="vote-buttons is-pulled-right">-->
-    <!--<font-awesome-icon style="color: green;" @click="upvote" icon="arrow-circle-up"/>-->
-    <!--<br>-->
-    <!--<font-awesome-icon style="color: red;" @click="downvote" icon="arrow-circle-down"/>-->
-    <!--</div>-->
-    <!--</div>-->
-    <!--</header>-->
-    <!--<div class="card-content">-->
-
-    <!--<div class="is-11">-->
-    <!--<div class="content is-clearfix">-->
-    <!--{{ post.body }}-->
-    <!--<a href="#">@bulmaio</a>. <a href="#">#css</a> <a href="#">#responsive</a>-->
-    <!--<br>-->
-    <!--<time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>-->
-    <!--</div>-->
-    <!--</div>-->
-    <!--</div>-->
-    <!--<footer class="card-footer">-->
-    <!--<a href="#" class="card-footer-item">Save</a>-->
-    <!--<a href="#" class="card-footer-item">Edit</a>-->
-    <!--<a href="#" class="card-footer-item">Delete</a>-->
-    <!--</footer>-->
-    <!--</div>-->
 </template>
 
 <script>
@@ -79,6 +39,9 @@
             };
         },
         computed: {
+            ytThumnnail() {
+                return 'https://img.youtube.com/vi/' + this.post.link + '/1.jpg';
+            },
             upArrow() {
                 return {
                     color: (this.post && this.post.usersVote && this.post.usersVote.value === 1) ? 'green' : ''
@@ -94,45 +57,49 @@
             this.post = this.content;
         },
         watch: {
-            content: function(newVal) {
+            content: function (newVal) {
                 this.post = newVal;
             }
         },
         methods: {
             upvote() {
-                let self = this;
-                axios.patch('/posts/' + this.post.id + '/vote', {
-                    up: 1
-                }).then((r) => {
-                    if (self.post.usersVote.updated_at !== r.data.updated_at) {
-                        self.post.votesTotal++;
-                    }
-                    self.post.usersVote = r.data;
-                }).catch((e) => {
-
-                });
+                this.$emit('upvotePost', this.post);
             },
             downvote() {
-                let self = this;
-                axios.patch('/posts/' + this.post.id + '/vote')
-                    .then((r) => {
-                        if (self.post.usersVote.updated_at !== r.data.updated_at) {
-                            self.post.votesTotal--;
-                        }
-                        self.post.usersVote = r.data;
-                    })
-                    .catch((e) => {
-
-                    });
+                this.$emit('downvotePost', this.post);
             },
-
+            visitCategory() {
+                this.$router.push({ path: '/r/' + this.post.category.slug + '/' + (this.$route.params.sort || 'new')});
+            }
         }
     }
 </script>
 <style scoped lang="scss">
-    /*.card-content {*/
-    /*padding-left: 0.5rem;*/
-    /*}*/
+    .columns.is-gapless:not(:last-child) {
+        margin-bottom: 0.5rem;
+    }
+    .card-header {
+        margin-bottom: 0.5rem;
+
+        .card-header-title img {
+            max-height: 50px;
+            margin-right: 0.25rem;
+        }
+    }
+    .card-footer {
+        border: 0;
+        padding-left: 0.75rem;
+        span {
+            padding: 0.25rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+
+            &:hover {
+                background-color: #b5b5b5 !important;
+                color: white;
+            }
+        }
+    }
     .vote-buttons div {
         padding-left: 2px;
         padding-right: 2px;

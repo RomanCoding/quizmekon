@@ -10,28 +10,35 @@ require('./bootstrap');
 window.Vue = require('vue');
 window.moment = require('moment');
 
+import VueRouter from 'vue-router'
+
+import Vue from 'vue';
+export const EventBus = new Vue();
+window.Event = EventBus;
+
+Vue.use(VueRouter)
+
 import Buefy from 'buefy'
 import 'buefy/lib/buefy.css'
+
+
 
 
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faArrowCircleDown } from '@fortawesome/free-solid-svg-icons'
 import { faArrowCircleUp } from '@fortawesome/free-solid-svg-icons'
+import { faCommentAlt } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(faArrowCircleDown)
 library.add(faArrowCircleUp)
+library.add(faCommentAlt)
 
 window.Vue.use(Buefy)
 
-Vue.component('font-awesome-icon', FontAwesomeIcon)
 
-/**
- * Next, we will create a fresh Vue application instance and attach it to
- * the page. Then, you may begin adding components to this application
- * or customize the JavaScript scaffolding to fit your unique needs.
- */
+Vue.component('font-awesome-icon', FontAwesomeIcon)
 
 
 
@@ -43,9 +50,56 @@ Vue.component('site-header', require('./components/Header.vue'));
 
 import authMixin from './mixins/auth'
 
+import Main from './components/Main.vue'
+import PostPage from './components/PostPage.vue'
+import CreatePost from './components/CreatePost.vue'
+import Login from './components/Login.vue'
+
+const routes = [
+    { path: '/submit', component: CreatePost, meta: { requiresAuth: true}},
+    { path: '/login', component: Login },
+    { path: '/:sort?', component: Main },
+    { path: '/r/:subreddit/:post(\\d+)', component: PostPage },
+    { path: '/r/:subreddit/:sort?', component: Main },
+];
+const router = new VueRouter({
+    mode: 'history',
+    routes
+});
+
+
+router.beforeEach((to, from, next) => {
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+        axios.get('/sessionStatus')
+            .then(response => {
+                if (response.data.user) {
+                    next();
+                } else {
+                    next({
+                        path: '/login',
+                        query: {
+                            redirect: to.fullPath,
+                        },
+                    });
+                }
+            })
+            .catch(error => {
+                next({
+                    path: '/login',
+                    query: {
+                        redirect: to.fullPath,
+                    },
+                });
+            });
+    } else {
+        next();
+    }
+});
+
 const app = new Vue({
     mixins: [authMixin],
     el: '#app',
+    router,
     data: {
         user: null
     },
@@ -57,3 +111,4 @@ const app = new Vue({
             .catch(error => console.log(error));
     },
 });
+

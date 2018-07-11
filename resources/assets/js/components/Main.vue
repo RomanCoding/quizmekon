@@ -1,5 +1,5 @@
 <template>
-    <div class="columns">
+    <div>
         <posts></posts>
     </div>
 </template>
@@ -8,10 +8,13 @@
     import Posts from './Posts.vue'
     export default {
         components: {
-            'posts': Posts
+            'posts': Posts,
         },
         data() {
-            return {};
+            return {
+            };
+        },
+        mounted() {
         },
         computed: {},
         watch: {},

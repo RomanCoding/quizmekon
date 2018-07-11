@@ -22,7 +22,8 @@ class PostsTableSeeder extends Seeder
 
             factory(\App\Post::class, 1)->create([
                 'user_id' => $user->id,
-                'category_id' => $category->id
+                'category_id' => $category->id,
+                'type' => 0
             ]);
         }
     }

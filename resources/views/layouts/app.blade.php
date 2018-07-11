@@ -24,7 +24,6 @@
 <body>
 <div id="app">
     <site-header></site-header>
-
     <div class="container-fluid">
         @yield('content')
     </div>
