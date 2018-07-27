@@ -1,4 +1,7 @@
 <template>
+    <div>
+        <site-header></site-header>
+
     <section class="section">
         <template v-if="series.length">
             <b-table :data="series">
@@ -145,6 +148,7 @@
         </div>
 
     </section>
+    </div>
 </template>
 
 <script>

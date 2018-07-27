@@ -16,17 +16,16 @@
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css?family=Raleway:300,400,600" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Carter+One" rel="stylesheet">
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 </head>
 <body>
 <div id="app">
-    <site-header></site-header>
-    <div class="container-fluid">
-        @yield('content')
-    </div>
+    @yield('content')
 </div>
 </body>
 </html>

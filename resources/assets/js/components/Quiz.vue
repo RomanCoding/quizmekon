@@ -1,33 +1,52 @@
 <template>
-    <div class="card" v-if="!this.expand">
-        <header class="card-header is-mobile columns is-gapless">
-            <div class="column is-three-fifths-mobile is-two-thirds-tablet">
-                <p class="card-header-title is-paddingless" @click="$emit('expanded')">
-                    <img :src="thumbnail" alt="Thumbnail">
-                    {{ quiz.question }}
+    <div class="postbox">
+        <article class="media">
+            <div class="votebox">
+                <span class="upvote" style="font-size: 2rem;" @click="upvote" :style="upArrow">
+                    <i class="fas fa-caret-up"></i>
+                </span>
+                <span class="is-size-7 votes" v-text="quiz.votesTotal"></span>
+                <span class="downvote" style="font-size: 2rem;" @click="downvote" :style="downArrow">
+                    <i class="fas fa-caret-down"></i>
+                </span>
+            </div>
+            <figure class="media-left">
+                <p class="thumb_box">
+                    <img :src="thumbnail" @click="$emit('expanded')">
                 </p>
-            </div>
-            <div class="column is-gapless">
-                <div class="vote-buttons is-pulled-right">
-                    <span class="tag is-light pointer" v-text="quiz.category.name" @click="visitCategory"></span>
-
-                    <div class="is-pulled-right">
-                        <font-awesome-icon :style="upArrow" @click="upvote" icon="arrow-circle-up"/>
-                        <span>
-                            {{ quiz.votesTotal }}
-                        </span>
-                        <font-awesome-icon :style="downArrow" @click="downvote" icon="arrow-circle-down"/>
-                    </div>
+            </figure>
+            <div class="media-content">
+                <div class="content">
+                    <p>
+                        <strong class="is-size-5" v-text="quiz.question" @click="$emit('expanded')"></strong>
+                        <br>
+                        <span class="is-size-7 has-text-grey-light"> posted to: </span>
+                        <span class="has-text-weight-bold pointer" v-text="quiz.category.name" @click="visitCategory"></span>
+                        <span class="is-size-7 has-text-grey-light">, posted by :</span>
+                        <span class="has-text-weight-bold" v-text="quiz.user.username"></span>
+                        <span class="is-size-7 has-text-grey-light" v-text="timeFromNow"></span>
+                    </p>
                 </div>
+                <nav class="level is-mobile">
+                    <div class="level-left">
+                        <a class="level-item">
+                  <span class="icon is-small">
+                    <i class="fas fa-heart"></i>
+                  </span>
+                            <span class="is-size-7 has-text-grey-light">&nbsp, Save to favorites </span>
+                        </a>
+                        <a class="level-item">
+                  <span class="icon is-small">
+                    <i class="fas fa-flag-checkered"></i>
+                  </span>
+                            <span class="is-size-7 has-text-grey-light">&nbsp, Report </span>
+                        </a>
+                    </div>
+                </nav>
             </div>
-        </header>
-        <footer class="card-footer">
-            <span @click="$emit('expanded')"><font-awesome-icon size="xs" icon="comment-alt"/> {{ quiz.comments_count || 0 }} comments</span>
-            <span title="Report" style="margin-left: auto;">
-                <font-awesome-icon icon="flag"/> Report
-            </span>
-            <span class="posted-by" style="cursor: default;"> Posted by u/{{quiz.user.username}} {{ timeFromNow }}</span>
-        </footer>
+            <div class="media-right">
+            </div>
+        </article>
     </div>
 </template>
 
@@ -76,7 +95,7 @@
                 this.$emit('downvoteQuiz', this.quiz);
             },
             visitCategory() {
-                this.$router.push({ path: '/r/' + this.quiz.category.slug + '/' + (this.$route.params.sort || 'new')});
+                this.$router.push({path: '/r/' + this.quiz.category.slug + '/' + (this.$route.params.sort || 'new')});
             }
         }
     }
@@ -85,6 +104,7 @@
     .columns.is-gapless:not(:last-child) {
         margin-bottom: 0.5rem;
     }
+
     .card-header {
         margin-bottom: 0.5rem;
 
@@ -93,6 +113,7 @@
             margin-right: 0.25rem;
         }
     }
+
     .card-footer {
         border: 0;
         padding-left: 0.75rem;
@@ -108,6 +129,7 @@
             }
         }
     }
+
     .vote-buttons div {
         padding-left: 2px;
         padding-right: 2px;

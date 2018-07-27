@@ -1,5 +1,6 @@
 <template>
     <div>
+        <site-header></site-header>
         <div class="columns is-centered" v-if="quiz">
             <div class="column is-6-desktop is-10-tablet is-12-mobile">
                 <div class="columns is-multiline">

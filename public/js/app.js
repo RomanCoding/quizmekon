@@ -5337,334 +5337,6 @@ module.exports = g;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var authMixin = {
-    methods: {
-        checkIfLogged: function checkIfLogged() {
-            var vm = this;
-            return new Promise(function (resolve, reject) {
-                axios.get('/sessionStatus').then(function (response) {
-                    window.user = response.data.user;
-                    resolve(response.data.user);
-                }).catch(function (error) {
-                    window.user = null;
-                    reject(error.response.data);
-                });
-            });
-        },
-        out: function out() {
-            var vm = this;
-            return new Promise(function (resolve, reject) {
-                axios.post('/logout').then(function (response) {
-                    resolve(response.data.user);
-                }).catch(function (error) {
-                    reject(error.response.data);
-                });
-            });
-        }
-    }
-};
-
-/* harmony default export */ __webpack_exports__["a"] = (authMixin);
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(process) {
-
-var utils = __webpack_require__(1);
-var normalizeHeaderName = __webpack_require__(155);
-
-var DEFAULT_CONTENT_TYPE = {
-  'Content-Type': 'application/x-www-form-urlencoded'
-};
-
-function setContentTypeIfUnset(headers, value) {
-  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
-    headers['Content-Type'] = value;
-  }
-}
-
-function getDefaultAdapter() {
-  var adapter;
-  if (typeof XMLHttpRequest !== 'undefined') {
-    // For browsers use XHR adapter
-    adapter = __webpack_require__(12);
-  } else if (typeof process !== 'undefined') {
-    // For node use HTTP adapter
-    adapter = __webpack_require__(12);
-  }
-  return adapter;
-}
-
-var defaults = {
-  adapter: getDefaultAdapter(),
-
-  transformRequest: [function transformRequest(data, headers) {
-    normalizeHeaderName(headers, 'Content-Type');
-    if (utils.isFormData(data) ||
-      utils.isArrayBuffer(data) ||
-      utils.isBuffer(data) ||
-      utils.isStream(data) ||
-      utils.isFile(data) ||
-      utils.isBlob(data)
-    ) {
-      return data;
-    }
-    if (utils.isArrayBufferView(data)) {
-      return data.buffer;
-    }
-    if (utils.isURLSearchParams(data)) {
-      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
-      return data.toString();
-    }
-    if (utils.isObject(data)) {
-      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
-      return JSON.stringify(data);
-    }
-    return data;
-  }],
-
-  transformResponse: [function transformResponse(data) {
-    /*eslint no-param-reassign:0*/
-    if (typeof data === 'string') {
-      try {
-        data = JSON.parse(data);
-      } catch (e) { /* Ignore */ }
-    }
-    return data;
-  }],
-
-  /**
-   * A timeout in milliseconds to abort a request. If set to 0 (default) a
-   * timeout is not created.
-   */
-  timeout: 0,
-
-  xsrfCookieName: 'XSRF-TOKEN',
-  xsrfHeaderName: 'X-XSRF-TOKEN',
-
-  maxContentLength: -1,
-
-  validateStatus: function validateStatus(status) {
-    return status >= 200 && status < 300;
-  }
-};
-
-defaults.headers = {
-  common: {
-    'Accept': 'application/json, text/plain, */*'
-  }
-};
-
-utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
-  defaults.headers[method] = {};
-});
-
-utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
-  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
-});
-
-module.exports = defaults;
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports) {
-
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-
-process.listeners = function (name) { return [] }
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-
-/***/ }),
-/* 9 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 /* unused harmony export fas */
 /* unused harmony export prefix */
 /* unused harmony export faAddressBook */
@@ -7896,6 +7568,334 @@ var _iconsCache = {
 };
 
 
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+var authMixin = {
+    methods: {
+        checkIfLogged: function checkIfLogged() {
+            var vm = this;
+            return new Promise(function (resolve, reject) {
+                axios.get('/sessionStatus').then(function (response) {
+                    window.user = response.data.user;
+                    resolve(response.data.user);
+                }).catch(function (error) {
+                    window.user = null;
+                    reject(error.response.data);
+                });
+            });
+        },
+        out: function out() {
+            var vm = this;
+            return new Promise(function (resolve, reject) {
+                axios.post('/logout').then(function (response) {
+                    resolve(response.data.user);
+                }).catch(function (error) {
+                    reject(error.response.data);
+                });
+            });
+        }
+    }
+};
+
+/* harmony default export */ __webpack_exports__["a"] = (authMixin);
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var utils = __webpack_require__(1);
+var normalizeHeaderName = __webpack_require__(155);
+
+var DEFAULT_CONTENT_TYPE = {
+  'Content-Type': 'application/x-www-form-urlencoded'
+};
+
+function setContentTypeIfUnset(headers, value) {
+  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
+    headers['Content-Type'] = value;
+  }
+}
+
+function getDefaultAdapter() {
+  var adapter;
+  if (typeof XMLHttpRequest !== 'undefined') {
+    // For browsers use XHR adapter
+    adapter = __webpack_require__(12);
+  } else if (typeof process !== 'undefined') {
+    // For node use HTTP adapter
+    adapter = __webpack_require__(12);
+  }
+  return adapter;
+}
+
+var defaults = {
+  adapter: getDefaultAdapter(),
+
+  transformRequest: [function transformRequest(data, headers) {
+    normalizeHeaderName(headers, 'Content-Type');
+    if (utils.isFormData(data) ||
+      utils.isArrayBuffer(data) ||
+      utils.isBuffer(data) ||
+      utils.isStream(data) ||
+      utils.isFile(data) ||
+      utils.isBlob(data)
+    ) {
+      return data;
+    }
+    if (utils.isArrayBufferView(data)) {
+      return data.buffer;
+    }
+    if (utils.isURLSearchParams(data)) {
+      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
+      return data.toString();
+    }
+    if (utils.isObject(data)) {
+      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
+      return JSON.stringify(data);
+    }
+    return data;
+  }],
+
+  transformResponse: [function transformResponse(data) {
+    /*eslint no-param-reassign:0*/
+    if (typeof data === 'string') {
+      try {
+        data = JSON.parse(data);
+      } catch (e) { /* Ignore */ }
+    }
+    return data;
+  }],
+
+  /**
+   * A timeout in milliseconds to abort a request. If set to 0 (default) a
+   * timeout is not created.
+   */
+  timeout: 0,
+
+  xsrfCookieName: 'XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN',
+
+  maxContentLength: -1,
+
+  validateStatus: function validateStatus(status) {
+    return status >= 200 && status < 300;
+  }
+};
+
+defaults.headers = {
+  common: {
+    'Accept': 'application/json, text/plain, */*'
+  }
+};
+
+utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
+  defaults.headers[method] = {};
+});
+
+utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
+});
+
+module.exports = defaults;
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports) {
+
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
 
 
 /***/ }),
@@ -33176,10 +33176,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_buefy_lib_buefy_css__ = __webpack_require__(188);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_buefy_lib_buefy_css___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_buefy_lib_buefy_css__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__fortawesome_fontawesome_svg_core__ = __webpack_require__(140);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__fortawesome_free_solid_svg_icons__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__fortawesome_free_solid_svg_icons__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__fortawesome_vue_fontawesome__ = __webpack_require__(192);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__fortawesome_vue_fontawesome___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_7__fortawesome_vue_fontawesome__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__mixins_auth__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__mixins_auth__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__components_Main_vue__ = __webpack_require__(142);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__components_Main_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_9__components_Main_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__components_QuizPage_vue__ = __webpack_require__(227);
@@ -63383,7 +63383,7 @@ module.exports = __webpack_require__(152);
 var utils = __webpack_require__(1);
 var bind = __webpack_require__(11);
 var Axios = __webpack_require__(154);
-var defaults = __webpack_require__(7);
+var defaults = __webpack_require__(8);
 
 /**
  * Create an instance of Axios
@@ -63466,7 +63466,7 @@ function isSlowBuffer (obj) {
 "use strict";
 
 
-var defaults = __webpack_require__(7);
+var defaults = __webpack_require__(8);
 var utils = __webpack_require__(1);
 var InterceptorManager = __webpack_require__(163);
 var dispatchRequest = __webpack_require__(164);
@@ -64005,7 +64005,7 @@ module.exports = InterceptorManager;
 var utils = __webpack_require__(1);
 var transformData = __webpack_require__(165);
 var isCancel = __webpack_require__(14);
-var defaults = __webpack_require__(7);
+var defaults = __webpack_require__(8);
 var isAbsoluteURL = __webpack_require__(166);
 var combineURLs = __webpack_require__(167);
 
@@ -64516,7 +64516,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5), __webpack_require__(8)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5), __webpack_require__(9)))
 
 /***/ }),
 /* 172 */
@@ -68289,7 +68289,7 @@ function localstorage() {
   } catch (e) {}
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
 
 /***/ }),
 /* 181 */
@@ -70345,7 +70345,7 @@ exports.push([module.i, "\nhtml[data-v-01e7f602], body[data-v-01e7f602] {\n    f
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mixins_auth__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mixins_auth__ = __webpack_require__(7);
 //
 //
 //
@@ -70679,7 +70679,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
@@ -70698,6 +70698,76 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -70709,9 +70779,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     },
     mounted: function mounted() {},
 
-    computed: {},
+    computed: {
+        filteredByChannel: function filteredByChannel() {
+            return this.$route.params.subreddit;
+        }
+    },
     watch: {},
-    methods: {}
+    methods: {
+        toHomepage: function toHomepage() {
+            this.$router.push({ path: '/' + (this.$route.params.sort || 'new') });
+        },
+        createPost: function createPost() {
+            this.$router.push({ path: '/submit' });
+        }
+    }
 });
 
 /***/ }),
@@ -70800,7 +70881,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n.panel-tabs[data-v-9e6ae4e8] {\n    -webkit-box-pack: start;\n        -ms-flex-pack: start;\n            justify-content: start;\n    margin-bottom: 1px;\n}\n.card[data-v-9e6ae4e8] {\n    margin-bottom: 2rem;\n}\n", ""]);
+exports.push([module.i, "\n.panel-tabs[data-v-9e6ae4e8] {\n    -webkit-box-pack: start;\n        -ms-flex-pack: start;\n            justify-content: start;\n    margin-bottom: 1px;\n}\n.is-active[data-v-9e6ae4e8] {\n    color: red;\n}\n.card[data-v-9e6ae4e8] {\n    margin-bottom: 2rem;\n}\n", ""]);
 
 // exports
 
@@ -70813,6 +70894,22 @@ exports.push([module.i, "\n.panel-tabs[data-v-9e6ae4e8] {\n    -webkit-box-pack:
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Quiz_vue__ = __webpack_require__(210);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Quiz_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__Quiz_vue__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -71088,7 +71185,26 @@ exports.push([module.i, "\n.columns.is-gapless[data-v-c8a64468]:not(:last-child)
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mixins_auth__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mixins_auth__ = __webpack_require__(7);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -71182,131 +71298,128 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return !this.expand
-    ? _c("div", { staticClass: "card" }, [
+  return _c("div", { staticClass: "postbox" }, [
+    _c("article", { staticClass: "media" }, [
+      _c("div", { staticClass: "votebox" }, [
         _c(
-          "header",
-          { staticClass: "card-header is-mobile columns is-gapless" },
-          [
-            _c(
-              "div",
-              {
-                staticClass:
-                  "column is-three-fifths-mobile is-two-thirds-tablet"
-              },
-              [
-                _c(
-                  "p",
-                  {
-                    staticClass: "card-header-title is-paddingless",
-                    on: {
-                      click: function($event) {
-                        _vm.$emit("expanded")
-                      }
-                    }
-                  },
-                  [
-                    _c("img", {
-                      attrs: { src: _vm.thumbnail, alt: "Thumbnail" }
-                    }),
-                    _vm._v(
-                      "\n                " +
-                        _vm._s(_vm.quiz.question) +
-                        "\n            "
-                    )
-                  ]
-                )
-              ]
-            ),
-            _vm._v(" "),
-            _c("div", { staticClass: "column is-gapless" }, [
-              _c("div", { staticClass: "vote-buttons is-pulled-right" }, [
-                _c("span", {
-                  staticClass: "tag is-light pointer",
-                  domProps: { textContent: _vm._s(_vm.quiz.category.name) },
-                  on: { click: _vm.visitCategory }
-                }),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "is-pulled-right" },
-                  [
-                    _c("font-awesome-icon", {
-                      style: _vm.upArrow,
-                      attrs: { icon: "arrow-circle-up" },
-                      on: { click: _vm.upvote }
-                    }),
-                    _vm._v(" "),
-                    _c("span", [
-                      _vm._v(
-                        "\n                        " +
-                          _vm._s(_vm.quiz.votesTotal) +
-                          "\n                    "
-                      )
-                    ]),
-                    _vm._v(" "),
-                    _c("font-awesome-icon", {
-                      style: _vm.downArrow,
-                      attrs: { icon: "arrow-circle-down" },
-                      on: { click: _vm.downvote }
-                    })
-                  ],
-                  1
-                )
-              ])
-            ])
-          ]
+          "span",
+          {
+            staticClass: "upvote",
+            staticStyle: { "font-size": "2rem" },
+            style: _vm.upArrow,
+            on: { click: _vm.upvote }
+          },
+          [_c("i", { staticClass: "fas fa-caret-up" })]
         ),
         _vm._v(" "),
-        _c("footer", { staticClass: "card-footer" }, [
-          _c(
-            "span",
-            {
+        _c("span", {
+          staticClass: "is-size-7 votes",
+          domProps: { textContent: _vm._s(_vm.quiz.votesTotal) }
+        }),
+        _vm._v(" "),
+        _c(
+          "span",
+          {
+            staticClass: "downvote",
+            staticStyle: { "font-size": "2rem" },
+            style: _vm.downArrow,
+            on: { click: _vm.downvote }
+          },
+          [_c("i", { staticClass: "fas fa-caret-down" })]
+        )
+      ]),
+      _vm._v(" "),
+      _c("figure", { staticClass: "media-left" }, [
+        _c("p", { staticClass: "thumb_box" }, [
+          _c("img", {
+            attrs: { src: _vm.thumbnail },
+            on: {
+              click: function($event) {
+                _vm.$emit("expanded")
+              }
+            }
+          })
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "media-content" }, [
+        _c("div", { staticClass: "content" }, [
+          _c("p", [
+            _c("strong", {
+              staticClass: "is-size-5",
+              domProps: { textContent: _vm._s(_vm.quiz.question) },
               on: {
                 click: function($event) {
                   _vm.$emit("expanded")
                 }
               }
-            },
-            [
-              _c("font-awesome-icon", {
-                attrs: { size: "xs", icon: "comment-alt" }
-              }),
-              _vm._v(" " + _vm._s(_vm.quiz.comments_count || 0) + " comments")
-            ],
-            1
-          ),
+            }),
+            _vm._v(" "),
+            _c("br"),
+            _vm._v(" "),
+            _c("span", { staticClass: "is-size-7 has-text-grey-light" }, [
+              _vm._v(" posted to: ")
+            ]),
+            _vm._v(" "),
+            _c("span", {
+              staticClass: "has-text-weight-bold pointer",
+              domProps: { textContent: _vm._s(_vm.quiz.category.name) },
+              on: { click: _vm.visitCategory }
+            }),
+            _vm._v(" "),
+            _c("span", { staticClass: "is-size-7 has-text-grey-light" }, [
+              _vm._v(", posted by :")
+            ]),
+            _vm._v(" "),
+            _c("span", {
+              staticClass: "has-text-weight-bold",
+              domProps: { textContent: _vm._s(_vm.quiz.user.username) }
+            }),
+            _vm._v(" "),
+            _c("span", {
+              staticClass: "is-size-7 has-text-grey-light",
+              domProps: { textContent: _vm._s(_vm.timeFromNow) }
+            })
+          ])
+        ]),
+        _vm._v(" "),
+        _vm._m(0)
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "media-right" })
+    ])
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("nav", { staticClass: "level is-mobile" }, [
+      _c("div", { staticClass: "level-left" }, [
+        _c("a", { staticClass: "level-item" }, [
+          _c("span", { staticClass: "icon is-small" }, [
+            _c("i", { staticClass: "fas fa-heart" })
+          ]),
           _vm._v(" "),
-          _c(
-            "span",
-            {
-              staticStyle: { "margin-left": "auto" },
-              attrs: { title: "Report" }
-            },
-            [
-              _c("font-awesome-icon", { attrs: { icon: "flag" } }),
-              _vm._v(" Report\n        ")
-            ],
-            1
-          ),
+          _c("span", { staticClass: "is-size-7 has-text-grey-light" }, [
+            _vm._v(" , Save to favorites ")
+          ])
+        ]),
+        _vm._v(" "),
+        _c("a", { staticClass: "level-item" }, [
+          _c("span", { staticClass: "icon is-small" }, [
+            _c("i", { staticClass: "fas fa-flag-checkered" })
+          ]),
           _vm._v(" "),
-          _c(
-            "span",
-            { staticClass: "posted-by", staticStyle: { cursor: "default" } },
-            [
-              _vm._v(
-                " Posted by u/" +
-                  _vm._s(_vm.quiz.user.username) +
-                  " " +
-                  _vm._s(_vm.timeFromNow)
-              )
-            ]
-          )
+          _c("span", { staticClass: "is-size-7 has-text-grey-light" }, [
+            _vm._v(" , Report ")
+          ])
         ])
       ])
-    : _vm._e()
-}
-var staticRenderFns = []
+    ])
+  }
+]
 render._withStripped = true
 module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
@@ -71324,107 +71437,78 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "columns" }, [
+  return _c("div", { staticClass: "content-wrapper" }, [
+    _c("div", { staticClass: "subheader" }, [
+      _vm._v("Sort by -\n        "),
+      _c(
+        "span",
+        {
+          class: { "is-active": _vm.sort == "new" },
+          staticStyle: { cursor: "pointer" },
+          on: {
+            click: function($event) {
+              _vm.changeSort("new")
+            }
+          }
+        },
+        [
+          _c("i", { staticClass: "fas fa-sun" }),
+          _vm._v("\n            new -\n        ")
+        ]
+      ),
+      _vm._v(" "),
+      _c(
+        "span",
+        {
+          class: { "is-active": _vm.sort == "voted" },
+          staticStyle: { cursor: "pointer" },
+          on: {
+            click: function($event) {
+              _vm.changeSort("voted")
+            }
+          }
+        },
+        [
+          _c("i", { staticClass: "fas fa-rocket" }),
+          _vm._v("\n        best -\n        ")
+        ]
+      ),
+      _vm._v(" "),
+      _c(
+        "span",
+        {
+          class: { "is-active": _vm.sort == "hot" },
+          staticStyle: { cursor: "pointer" },
+          on: {
+            click: function($event) {
+              _vm.changeSort("hot")
+            }
+          }
+        },
+        [
+          _c("i", { staticClass: "fab fa-hotjar" }),
+          _vm._v("\n        hot\n        ")
+        ]
+      )
+    ]),
+    _vm._v(" "),
     _c(
       "div",
-      { staticClass: "column is-8-desktop is-10-tablet is-12-mobile" },
-      [
-        _c("p", { staticClass: "panel-tabs" }, [
-          _c(
-            "a",
-            {
-              class: { "is-active": _vm.sort == "new" },
-              on: {
-                click: function($event) {
-                  _vm.changeSort("new")
-                }
-              }
-            },
-            [_vm._v("new")]
-          ),
-          _vm._v(" "),
-          _c(
-            "a",
-            {
-              class: { "is-active": _vm.sort == "hot" },
-              on: {
-                click: function($event) {
-                  _vm.changeSort("hot")
-                }
-              }
-            },
-            [_vm._v("hot")]
-          ),
-          _vm._v(" "),
-          _c(
-            "a",
-            {
-              class: { "is-active": _vm.sort == "voted" },
-              on: {
-                click: function($event) {
-                  _vm.changeSort("voted")
-                }
-              }
-            },
-            [_vm._v("most voted")]
-          )
-        ]),
-        _vm._v(" "),
-        _vm._l(_vm.quizzes, function(quiz, index) {
-          return _c("quiz", {
-            key: index,
-            attrs: { content: quiz },
-            on: {
-              upvoteQuiz: _vm.upvoteQuiz,
-              downvoteQuiz: _vm.downvoteQuiz,
-              expanded: function($event) {
-                _vm.visitQuizPage(quiz)
-              }
+      { staticClass: "maincontent" },
+      _vm._l(_vm.quizzes, function(quiz, index) {
+        return _c("quiz", {
+          key: index,
+          attrs: { content: quiz },
+          on: {
+            upvoteQuiz: _vm.upvoteQuiz,
+            downvoteQuiz: _vm.downvoteQuiz,
+            expanded: function($event) {
+              _vm.visitQuizPage(quiz)
             }
-          })
+          }
         })
-      ],
-      2
-    ),
-    _vm._v(" "),
-    _vm.filteredByChannel
-      ? _c(
-          "div",
-          { staticClass: "column is-4-desktop is-2-tablet is-12-mobile" },
-          [
-            _c("article", { staticClass: "message is-info" }, [
-              _c("div", { staticClass: "message-header" }, [
-                _c("p", {
-                  domProps: {
-                    textContent: _vm._s(this.$route.params.subreddit)
-                  }
-                })
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "message-body" }, [
-                _vm._v("\n                You are browsing "),
-                _c("b", [_vm._v(_vm._s(_vm.$route.params.subreddit))]),
-                _vm._v(" channel.\n                "),
-                _c("br"),
-                _vm._v("\n                If you want to go back, "),
-                _c(
-                  "a",
-                  {
-                    attrs: { href: "#" },
-                    on: {
-                      click: function($event) {
-                        $event.preventDefault()
-                        return _vm.toHomepage($event)
-                      }
-                    }
-                  },
-                  [_vm._v("click here.")]
-                )
-              ])
-            ])
-          ]
-        )
-      : _vm._e()
+      })
+    )
   ])
 }
 var staticRenderFns = []
@@ -71445,9 +71529,165 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [_c("quizzes")], 1)
+  return _c(
+    "div",
+    { staticClass: "wrapper" },
+    [
+      _c("site-header"),
+      _vm._v(" "),
+      _c("div", { staticClass: "sidebar" }, [
+        _c("div", { staticClass: "sidebar_top_box" }, [
+          _c("div", { staticClass: "field is-grouped is-grouped-centered" }, [
+            _c("img", {
+              staticStyle: { cursor: "pointer" },
+              attrs: { src: "images/add_content.png", alt: "" },
+              on: { click: _vm.createPost }
+            })
+          ])
+        ]),
+        _vm._v(" "),
+        _vm._m(0),
+        _vm._v(" "),
+        _vm.filteredByChannel
+          ? _c(
+              "div",
+              {
+                directives: [
+                  {
+                    name: "show",
+                    rawName: "v-show",
+                    value: _vm.filteredByChannel,
+                    expression: "filteredByChannel"
+                  }
+                ],
+                staticClass: "sidebar_ad_box"
+              },
+              [
+                _c("p", { staticClass: "is-size-7 has-text-info" }, [
+                  _vm._v("You are browsing "),
+                  _c("b", [_vm._v(_vm._s(_vm.$route.params.subreddit))]),
+                  _vm._v(" channel.\n                "),
+                  _c("br"),
+                  _vm._v("\n                If you want to go back, "),
+                  _c(
+                    "a",
+                    {
+                      attrs: { href: "#" },
+                      on: {
+                        click: function($event) {
+                          $event.preventDefault()
+                          return _vm.toHomepage($event)
+                        }
+                      }
+                    },
+                    [_vm._v("click here.")]
+                  )
+                ])
+              ]
+            )
+          : _vm._e(),
+        _vm._v(" "),
+        _vm._m(1),
+        _vm._v(" "),
+        _vm._m(2)
+      ]),
+      _vm._v(" "),
+      _c("quizzes")
+    ],
+    1
+  )
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "sidebar_ad_box" }, [
+      _c("p", { staticClass: "is-size-7 has-text-info" }, [
+        _vm._v("ADVERTISEMENT")
+      ]),
+      _vm._v(" "),
+      _c("img", { attrs: { src: "images/adsense300x250.PNG", alt: "" } })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "sidebar_top_box2" }, [
+      _c("div", { staticClass: "tabs is-boxed is-small" }, [
+        _c("ul", [
+          _c("li", { staticClass: "is-active" }, [
+            _c("a", [_vm._v("Top Points")])
+          ]),
+          _vm._v(" "),
+          _c("li", [_c("a", [_vm._v("Most Content")])]),
+          _vm._v(" "),
+          _c("li", [_c("a", [_vm._v("Most Voted")])])
+        ])
+      ]),
+      _vm._v(" "),
+      _c(
+        "table",
+        {
+          staticClass:
+            "table table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
+        },
+        [
+          _c("thead", [
+            _c("tr", [
+              _c("th", [
+                _c("abbr", { attrs: { title: "Position" } }, [_vm._v("Pos")])
+              ]),
+              _vm._v(" "),
+              _c("th", [_vm._v("User")]),
+              _vm._v(" "),
+              _c("th", [_vm._v("points")])
+            ])
+          ]),
+          _vm._v(" "),
+          _c("tbody", [
+            _c("tr", [
+              _c("td", [_vm._v("1")]),
+              _vm._v(" "),
+              _c("td", [_vm._v("Fred")]),
+              _vm._v(" "),
+              _c("td", [_vm._v("2005")])
+            ]),
+            _vm._v(" "),
+            _c("tr", [
+              _c("td", [_vm._v("2")]),
+              _vm._v(" "),
+              _c("td", [_vm._v("Jim")]),
+              _vm._v(" "),
+              _c("td", [_vm._v("2000")])
+            ]),
+            _vm._v(" "),
+            _c("tr", [
+              _c("td", [_vm._v("3")]),
+              _vm._v(" "),
+              _c("td", [_vm._v("Monty")]),
+              _vm._v(" "),
+              _c("td", [_vm._v("1960")])
+            ])
+          ])
+        ]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "sidebar_ad_box2" }, [
+      _c("p", { staticClass: "is-size-7 has-text-info" }, [
+        _vm._v("ADVERTISEMENT")
+      ]),
+      _vm._v(" "),
+      _c("img", { attrs: { src: "images/300x250.png", alt: "" } })
+    ])
+  }
+]
 render._withStripped = true
 module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
@@ -71543,7 +71783,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
@@ -71554,11 +71794,38 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mixins_auth__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mixins_auth__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__modals_Login_vue__ = __webpack_require__(143);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__modals_Login_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__modals_Login_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__modals_Registration_vue__ = __webpack_require__(223);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__modals_Registration_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__modals_Registration_vue__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -71627,12 +71894,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     mounted: function mounted() {
         var _this = this;
 
-        var burger = document.querySelector('.burger');
-        var nav = document.querySelector('#' + burger.dataset.target);
-        burger.addEventListener('click', function () {
-            burger.classList.toggle('is-active');
-            nav.classList.toggle('is-active');
-        });
+        //            let burger = document.querySelector('.burger');
+        //            let nav = document.querySelector('#' + burger.dataset.target);
+        //            burger.addEventListener('click', function () {
+        //                burger.classList.toggle('is-active');
+        //                nav.classList.toggle('is-active');
+        //            });
         window.Event.$on('login-modal', function () {
             _this.showLoginModal = true;
         });
@@ -72389,8 +72656,8 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c(
-    "nav",
-    { staticClass: "navbar" },
+    "div",
+    { staticClass: "header" },
     [
       _c(
         "b-modal",
@@ -72420,104 +72687,57 @@ var render = function() {
         1
       ),
       _vm._v(" "),
-      _c("div", { staticClass: "container" }, [
-        _vm._m(0),
-        _vm._v(" "),
-        _c("div", { staticClass: "navbar-menu", attrs: { id: "navMenu" } }, [
-          _c(
-            "div",
-            { staticClass: "navbar-end" },
-            [
-              this.$parent.user === false
-                ? [
-                    _c(
-                      "a",
-                      {
-                        staticClass: "navbar-item",
-                        on: { click: _vm.toggleLoginModal }
-                      },
-                      [_vm._v("Login")]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "a",
-                      {
-                        staticClass: "navbar-item",
-                        on: { click: _vm.toggleSignUpModal }
-                      },
-                      [_vm._v("Register")]
-                    )
-                  ]
-                : this.$parent.user
+      _c(
+        "nav",
+        {
+          staticClass: "navbar",
+          attrs: { role: "navigation", "aria-label": "main navigation" }
+        },
+        [
+          _vm._m(0),
+          _vm._v(" "),
+          _vm._m(1),
+          _vm._v(" "),
+          _c("div", { staticClass: "navbar-end" }, [
+            _c(
+              "div",
+              { staticClass: "navbar-item" },
+              [
+                this.$parent.$parent.user === false
                   ? [
                       _c(
-                        "b-dropdown",
-                        [
-                          _c(
-                            "a",
-                            {
-                              staticClass: "navbar-item",
-                              attrs: { slot: "trigger" },
-                              slot: "trigger"
-                            },
-                            [
-                              _vm._v(
-                                "\n                            " +
-                                  _vm._s(this.$parent.user.username) +
-                                  "\n                            "
-                              ),
-                              _c("b-icon", { attrs: { icon: "menu-down" } })
-                            ],
-                            1
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "b-dropdown-item",
-                            {
-                              attrs: { title: "Poll quizzes to get experience" }
-                            },
-                            [
-                              _vm._v(
-                                "Experience: " +
-                                  _vm._s(this.$parent.user.experience)
-                              )
-                            ]
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "b-dropdown-item",
-                            { on: { click: _vm.createPost } },
-                            [_vm._v("Add new")]
-                          ),
-                          _vm._v(" "),
-                          _c("b-dropdown-item", { on: { click: _vm.logout } }, [
-                            _vm._v("Logout")
-                          ])
-                        ],
-                        1
+                        "a",
+                        {
+                          staticClass: "navbar-item",
+                          on: { click: _vm.toggleLoginModal }
+                        },
+                        [_vm._v("Login")]
                       ),
                       _vm._v(" "),
                       _c(
-                        "form",
+                        "a",
                         {
-                          ref: "logoutForm",
-                          staticStyle: { display: "none" },
-                          attrs: { action: "/logout", method: "POST" }
+                          staticClass: "navbar-item",
+                          on: { click: _vm.toggleSignUpModal }
                         },
-                        [
-                          _c("input", {
-                            attrs: { type: "hidden", name: "_token" },
-                            domProps: { value: _vm.csrf }
-                          })
-                        ]
+                        [_vm._v("Register")]
                       )
                     ]
-                  : _vm._e()
-            ],
-            2
-          )
-        ])
-      ])
+                  : this.$parent.$parent.user
+                    ? [
+                        _vm._v(
+                          "\n                    " +
+                            _vm._s(this.$parent.$parent.user.username) +
+                            "\n                "
+                        )
+                      ]
+                    : _vm._e()
+              ],
+              2
+            )
+          ])
+        ]
+      )
     ],
     1
   )
@@ -72529,18 +72749,38 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "navbar-brand" }, [
       _c("a", { staticClass: "navbar-item", attrs: { href: "/" } }, [
-        _vm._v("\n                Quizmekon\n            ")
-      ]),
-      _vm._v(" "),
-      _c(
-        "span",
-        {
-          staticClass: "navbar-burger burger",
-          attrs: { "data-target": "navMenu" }
-        },
-        [_c("span"), _vm._v(" "), _c("span"), _vm._v(" "), _c("span")]
-      )
+        _c("img", {
+          attrs: {
+            src: "/images/quizmekon_logo.png",
+            alt: "quizmekon",
+            height: "50"
+          }
+        }),
+        _vm._v(" "),
+        _c("p", { staticClass: "titlefont" }, [_vm._v("Quizmekon")])
+      ])
     ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      { staticClass: "navbar-item", attrs: { id: "searchbox" } },
+      [
+        _c("p", { staticClass: "control has-icons-left" }, [
+          _c("input", {
+            staticClass: "input",
+            attrs: { type: "text", placeholder: "Search" }
+          }),
+          _vm._v(" "),
+          _c("span", { staticClass: "icon is-medium is-left" }, [
+            _c("i", { staticClass: "fas fa-search" })
+          ])
+        ])
+      ]
+    )
   }
 ]
 render._withStripped = true
@@ -72653,6 +72893,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Comment_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__Comment_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__modals_Login_vue__ = __webpack_require__(143);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__modals_Login_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__modals_Login_vue__);
+//
 //
 //
 //
@@ -73376,114 +73617,164 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [
-    _vm.quiz
-      ? _c("div", { staticClass: "columns is-centered" }, [
-          _c(
-            "div",
-            { staticClass: "column is-6-desktop is-10-tablet is-12-mobile" },
-            [
-              _c("div", { staticClass: "columns is-multiline" }, [
-                _c("div", { staticClass: "column is-1" }, [
-                  _c("div", { staticClass: "vote-buttons is-pulled-right" }, [
-                    _c(
-                      "div",
-                      [
-                        _c("font-awesome-icon", {
-                          style: _vm.upArrow,
-                          attrs: { icon: "arrow-circle-up" },
-                          on: { click: _vm.upvote }
-                        }),
-                        _vm._v(" "),
-                        _c("span", [
-                          _vm._v(
-                            "\n                        " +
-                              _vm._s(_vm.quiz.votesTotal) +
-                              "\n                    "
-                          )
-                        ]),
-                        _vm._v(" "),
-                        _c("font-awesome-icon", {
-                          style: _vm.downArrow,
-                          attrs: { icon: "arrow-circle-down" },
-                          on: { click: _vm.downvote }
-                        })
-                      ],
-                      1
-                    )
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "column is-11" }, [
-                  _c(
-                    "header",
-                    { staticClass: "card-header is-mobile columns" },
-                    [
+  return _c(
+    "div",
+    [
+      _c("site-header"),
+      _vm._v(" "),
+      _vm.quiz
+        ? _c("div", { staticClass: "columns is-centered" }, [
+            _c(
+              "div",
+              { staticClass: "column is-6-desktop is-10-tablet is-12-mobile" },
+              [
+                _c("div", { staticClass: "columns is-multiline" }, [
+                  _c("div", { staticClass: "column is-1" }, [
+                    _c("div", { staticClass: "vote-buttons is-pulled-right" }, [
                       _c(
                         "div",
-                        { staticClass: "column is-6-desktop is-9-mobile" },
                         [
-                          _c("p", { staticClass: "card-header-title" }, [
-                            _c("span", { staticClass: "posted-by" }, [
-                              _vm._v(
-                                " Posted by u/" +
-                                  _vm._s(_vm.quiz.user.username) +
-                                  " " +
-                                  _vm._s(_vm.timeFromNow)
-                              )
-                            ]),
-                            _vm._v(" "),
-                            _c("span", { staticClass: "post-title" }, [
-                              _vm._v(" " + _vm._s(_vm.quiz.title))
-                            ])
-                          ])
-                        ]
-                      )
-                    ]
-                  ),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "card-content" }, [
-                    _c("h4", {
-                      staticClass: "is-size-4",
-                      domProps: { textContent: _vm._s(_vm.quiz.question) }
-                    }),
-                    _vm._v(" "),
-                    _vm.showVideo
-                      ? _c(
-                          "div",
-                          { staticClass: "media" },
-                          [
-                            _c("youtube", {
-                              ref: "youtube",
-                              staticStyle: { "margin-top": "1rem" },
-                              attrs: {
-                                "video-id": _vm.quiz.video.youtube_id,
-                                "player-vars": _vm.playerVars
-                              },
-                              on: { ended: _vm.ended }
-                            })
-                          ],
-                          1
-                        )
-                      : _vm._e(),
-                    _vm._v(" "),
-                    _c(
-                      "div",
-                      {
-                        directives: [
-                          {
-                            name: "show",
-                            rawName: "v-show",
-                            value: _vm.showQuiz,
-                            expression: "showQuiz"
-                          }
+                          _c("font-awesome-icon", {
+                            style: _vm.upArrow,
+                            attrs: { icon: "arrow-circle-up" },
+                            on: { click: _vm.upvote }
+                          }),
+                          _vm._v(" "),
+                          _c("span", [
+                            _vm._v(
+                              "\n                        " +
+                                _vm._s(_vm.quiz.votesTotal) +
+                                "\n                    "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("font-awesome-icon", {
+                            style: _vm.downArrow,
+                            attrs: { icon: "arrow-circle-down" },
+                            on: { click: _vm.downvote }
+                          })
                         ],
-                        staticClass: "content"
-                      },
+                        1
+                      )
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "column is-11" }, [
+                    _c(
+                      "header",
+                      { staticClass: "card-header is-mobile columns" },
                       [
-                        !_vm.quiz.usersPoll
-                          ? [
-                              _vm._l(JSON.parse(_vm.quiz.answers), function(
+                        _c(
+                          "div",
+                          { staticClass: "column is-6-desktop is-9-mobile" },
+                          [
+                            _c("p", { staticClass: "card-header-title" }, [
+                              _c("span", { staticClass: "posted-by" }, [
+                                _vm._v(
+                                  " Posted by u/" +
+                                    _vm._s(_vm.quiz.user.username) +
+                                    " " +
+                                    _vm._s(_vm.timeFromNow)
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("span", { staticClass: "post-title" }, [
+                                _vm._v(" " + _vm._s(_vm.quiz.title))
+                              ])
+                            ])
+                          ]
+                        )
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "card-content" }, [
+                      _c("h4", {
+                        staticClass: "is-size-4",
+                        domProps: { textContent: _vm._s(_vm.quiz.question) }
+                      }),
+                      _vm._v(" "),
+                      _vm.showVideo
+                        ? _c(
+                            "div",
+                            { staticClass: "media" },
+                            [
+                              _c("youtube", {
+                                ref: "youtube",
+                                staticStyle: { "margin-top": "1rem" },
+                                attrs: {
+                                  "video-id": _vm.quiz.video.youtube_id,
+                                  "player-vars": _vm.playerVars
+                                },
+                                on: { ended: _vm.ended }
+                              })
+                            ],
+                            1
+                          )
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        {
+                          directives: [
+                            {
+                              name: "show",
+                              rawName: "v-show",
+                              value: _vm.showQuiz,
+                              expression: "showQuiz"
+                            }
+                          ],
+                          staticClass: "content"
+                        },
+                        [
+                          !_vm.quiz.usersPoll
+                            ? [
+                                _vm._l(JSON.parse(_vm.quiz.answers), function(
+                                  a,
+                                  key
+                                ) {
+                                  return _vm.showQuiz
+                                    ? _c(
+                                        "div",
+                                        { staticClass: "field" },
+                                        [
+                                          _c(
+                                            "b-radio",
+                                            {
+                                              attrs: { "native-value": key },
+                                              model: {
+                                                value: _vm.answer,
+                                                callback: function($$v) {
+                                                  _vm.answer = $$v
+                                                },
+                                                expression: "answer"
+                                              }
+                                            },
+                                            [
+                                              _vm._v(
+                                                "\n                                        " +
+                                                  _vm._s(a) +
+                                                  "\n                                    "
+                                              )
+                                            ]
+                                          )
+                                        ],
+                                        1
+                                      )
+                                    : _vm._e()
+                                }),
+                                _vm._v(" "),
+                                _vm.answer !== null
+                                  ? _c(
+                                      "a",
+                                      {
+                                        staticClass: "button is-primary",
+                                        on: { click: _vm.poll }
+                                      },
+                                      [_vm._v("Vote")]
+                                    )
+                                  : _vm._e()
+                              ]
+                            : _vm._l(JSON.parse(_vm.quiz.answers), function(
                                 a,
                                 key
                               ) {
@@ -73495,13 +73786,22 @@ var render = function() {
                                         _c(
                                           "b-radio",
                                           {
-                                            attrs: { "native-value": key },
+                                            style: _vm.pollCss(key),
+                                            attrs: {
+                                              disabled: "",
+                                              "native-value": key,
+                                              type: _vm.pollStyle(key)
+                                            },
                                             model: {
-                                              value: _vm.answer,
+                                              value: _vm.quiz.usersPoll.index,
                                               callback: function($$v) {
-                                                _vm.answer = $$v
+                                                _vm.$set(
+                                                  _vm.quiz.usersPoll,
+                                                  "index",
+                                                  $$v
+                                                )
                                               },
-                                              expression: "answer"
+                                              expression: "quiz.usersPoll.index"
                                             }
                                           },
                                           [
@@ -73516,157 +73816,107 @@ var render = function() {
                                       1
                                     )
                                   : _vm._e()
-                              }),
-                              _vm._v(" "),
-                              _vm.answer !== null
-                                ? _c(
-                                    "a",
-                                    {
-                                      staticClass: "button is-primary",
-                                      on: { click: _vm.poll }
-                                    },
-                                    [_vm._v("Vote")]
-                                  )
-                                : _vm._e()
-                            ]
-                          : _vm._l(JSON.parse(_vm.quiz.answers), function(
-                              a,
-                              key
-                            ) {
-                              return _vm.showQuiz
-                                ? _c(
-                                    "div",
-                                    { staticClass: "field" },
-                                    [
-                                      _c(
-                                        "b-radio",
-                                        {
-                                          style: _vm.pollCss(key),
-                                          attrs: {
-                                            disabled: "",
-                                            "native-value": key,
-                                            type: _vm.pollStyle(key)
-                                          },
-                                          model: {
-                                            value: _vm.quiz.usersPoll.index,
-                                            callback: function($$v) {
-                                              _vm.$set(
-                                                _vm.quiz.usersPoll,
-                                                "index",
-                                                $$v
-                                              )
-                                            },
-                                            expression: "quiz.usersPoll.index"
-                                          }
-                                        },
-                                        [
-                                          _vm._v(
-                                            "\n                                        " +
-                                              _vm._s(a) +
-                                              "\n                                    "
-                                          )
-                                        ]
-                                      )
-                                    ],
-                                    1
-                                  )
-                                : _vm._e()
-                            })
-                      ],
-                      2
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c("footer", { staticClass: "card-footer" }, [
-                    this.quiz.comments
-                      ? _c("div", { staticClass: "columns is-multiline" }, [
-                          this.$parent.user
-                            ? _c(
-                                "div",
-                                { staticClass: "column is-12 comments" },
-                                [
-                                  _c("b-input", {
-                                    attrs: {
-                                      type: "textarea",
-                                      size: "is-small",
-                                      rows: "4",
-                                      placeholder: "What are your thoughts?"
-                                    },
-                                    model: {
-                                      value: _vm.quizComment,
-                                      callback: function($$v) {
-                                        _vm.quizComment = $$v
-                                      },
-                                      expression: "quizComment"
-                                    }
-                                  }),
-                                  _vm._v(" "),
-                                  _c(
-                                    "button",
-                                    {
-                                      staticClass:
-                                        "button is-primary is-small is-pulled-right",
-                                      on: { click: _vm.commentQuiz }
-                                    },
-                                    [
-                                      _vm._v(
-                                        "\n                                    Comment\n                                "
-                                      )
-                                    ]
-                                  )
-                                ],
-                                1
-                              )
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _c(
-                            "div",
-                            { staticClass: "column is-12" },
-                            _vm._l(_vm.quiz.comments, function(comment, index) {
-                              return _c("comment", {
-                                key: index,
-                                attrs: { content: comment }
                               })
-                            })
-                          )
-                        ])
-                      : _c("article", { staticClass: "message" }, [
-                          _c("div", { staticClass: "message-body" }, [
-                            _vm._v(
-                              "\n                                Comments will be available after answering the question.\n                            "
+                        ],
+                        2
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("footer", { staticClass: "card-footer" }, [
+                      this.quiz.comments
+                        ? _c("div", { staticClass: "columns is-multiline" }, [
+                            this.$parent.user
+                              ? _c(
+                                  "div",
+                                  { staticClass: "column is-12 comments" },
+                                  [
+                                    _c("b-input", {
+                                      attrs: {
+                                        type: "textarea",
+                                        size: "is-small",
+                                        rows: "4",
+                                        placeholder: "What are your thoughts?"
+                                      },
+                                      model: {
+                                        value: _vm.quizComment,
+                                        callback: function($$v) {
+                                          _vm.quizComment = $$v
+                                        },
+                                        expression: "quizComment"
+                                      }
+                                    }),
+                                    _vm._v(" "),
+                                    _c(
+                                      "button",
+                                      {
+                                        staticClass:
+                                          "button is-primary is-small is-pulled-right",
+                                        on: { click: _vm.commentQuiz }
+                                      },
+                                      [
+                                        _vm._v(
+                                          "\n                                    Comment\n                                "
+                                        )
+                                      ]
+                                    )
+                                  ],
+                                  1
+                                )
+                              : _vm._e(),
+                            _vm._v(" "),
+                            _c(
+                              "div",
+                              { staticClass: "column is-12" },
+                              _vm._l(_vm.quiz.comments, function(
+                                comment,
+                                index
+                              ) {
+                                return _c("comment", {
+                                  key: index,
+                                  attrs: { content: comment }
+                                })
+                              })
                             )
                           ])
-                        ])
-                  ])
-                ]),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "column is-12" },
-                  [
-                    _c("b-pagination", {
-                      attrs: {
-                        total: _vm.series.length,
-                        "per-page": "1",
-                        current: _vm.quizOrder,
-                        order: "is-centered",
-                        rounded: true
-                      },
-                      on: {
-                        "update:current": function($event) {
-                          _vm.quizOrder = $event
+                        : _c("article", { staticClass: "message" }, [
+                            _c("div", { staticClass: "message-body" }, [
+                              _vm._v(
+                                "\n                                Comments will be available after answering the question.\n                            "
+                              )
+                            ])
+                          ])
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "column is-12" },
+                    [
+                      _c("b-pagination", {
+                        attrs: {
+                          total: _vm.series.length,
+                          "per-page": "1",
+                          current: _vm.quizOrder,
+                          order: "is-centered",
+                          rounded: true
+                        },
+                        on: {
+                          "update:current": function($event) {
+                            _vm.quizOrder = $event
+                          }
                         }
-                      }
-                    })
-                  ],
-                  1
-                )
-              ])
-            ]
-          )
-        ])
-      : _vm._e()
-  ])
+                      })
+                    ],
+                    1
+                  )
+                ])
+              ]
+            )
+          ])
+        : _vm._e()
+    ],
+    1
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -73775,6 +74025,10 @@ exports.push([module.i, "\n.questionblock[data-v-10373c73],\narticle.media[data-
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
 //
 //
 //
@@ -74289,389 +74543,302 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c(
-    "section",
-    { staticClass: "section" },
+    "div",
     [
-      _vm.series.length
-        ? [
-            _c("b-table", {
-              attrs: { data: _vm.series },
-              scopedSlots: _vm._u([
-                {
-                  key: "default",
-                  fn: function(props) {
-                    return [
-                      _c(
-                        "b-table-column",
-                        { attrs: { field: "question", label: "Question" } },
-                        [
-                          _vm._v(
-                            "\n                    " +
-                              _vm._s(props.row.question) +
-                              "\n                "
+      _c("site-header"),
+      _vm._v(" "),
+      _c(
+        "section",
+        { staticClass: "section" },
+        [
+          _vm.series.length
+            ? [
+                _c("b-table", {
+                  attrs: { data: _vm.series },
+                  scopedSlots: _vm._u([
+                    {
+                      key: "default",
+                      fn: function(props) {
+                        return [
+                          _c(
+                            "b-table-column",
+                            { attrs: { field: "question", label: "Question" } },
+                            [
+                              _vm._v(
+                                "\n                    " +
+                                  _vm._s(props.row.question) +
+                                  "\n                "
+                              )
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "b-table-column",
+                            {
+                              attrs: {
+                                field: "correct_answer",
+                                label: "Correct Answer"
+                              }
+                            },
+                            [
+                              _vm._v(
+                                "\n                    " +
+                                  _vm._s(props.row.correct_answer) +
+                                  "\n                "
+                              )
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "b-table-column",
+                            {
+                              attrs: {
+                                field: "false_answer",
+                                label: "False Answer 1"
+                              }
+                            },
+                            [
+                              _vm._v(
+                                "\n                    " +
+                                  _vm._s(props.row.false_answer) +
+                                  "\n                "
+                              )
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "b-table-column",
+                            {
+                              attrs: {
+                                field: "false_answer_2",
+                                label: "False Answer 2"
+                              }
+                            },
+                            [
+                              _vm._v(
+                                "\n                    " +
+                                  _vm._s(props.row.false_answer_2) +
+                                  "\n                "
+                              )
+                            ]
                           )
                         ]
-                      ),
-                      _vm._v(" "),
+                      }
+                    }
+                  ])
+                }),
+                _vm._v(" "),
+                _c(
+                  "a",
+                  {
+                    staticClass: "button is-primary",
+                    on: { click: _vm.submit }
+                  },
+                  [_vm._v("Create series")]
+                )
+              ]
+            : _vm._e(),
+          _vm._v(" "),
+          _c("h3", { staticClass: "is-size-5 has-text-info" }, [
+            _vm._v("Start by pasting the Youtube URL you'd like to use below")
+          ]),
+          _vm._v(" "),
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.url,
+                expression: "url"
+              }
+            ],
+            staticClass: "input is-rounded",
+            attrs: { type: "text", placeholder: "YouTube URL" },
+            domProps: { value: _vm.url },
+            on: {
+              input: [
+                function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.url = $event.target.value
+                },
+                _vm.onInput
+              ]
+            }
+          }),
+          _vm._v(" "),
+          _c("article", { staticClass: "media" }, [
+            _c("figure", { staticClass: "media-left" }, [
+              _c("p", { staticClass: "image" }, [
+                _c("img", { attrs: { src: _vm.thumb } })
+              ])
+            ]),
+            _vm._v(" "),
+            _vm.title || _vm.description
+              ? _c("div", { staticClass: "media-content" }, [
+                  _c(
+                    "div",
+                    { staticClass: "content" },
+                    [
                       _c(
-                        "b-table-column",
-                        {
-                          attrs: {
-                            field: "correct_answer",
-                            label: "Correct Answer"
-                          }
-                        },
+                        "b-notification",
+                        { ref: "element", attrs: { closable: false } },
                         [
-                          _vm._v(
-                            "\n                    " +
-                              _vm._s(props.row.correct_answer) +
-                              "\n                "
-                          )
-                        ]
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "b-table-column",
-                        {
-                          attrs: {
-                            field: "false_answer",
-                            label: "False Answer 1"
-                          }
-                        },
-                        [
-                          _vm._v(
-                            "\n                    " +
-                              _vm._s(props.row.false_answer) +
-                              "\n                "
-                          )
-                        ]
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "b-table-column",
-                        {
-                          attrs: {
-                            field: "false_answer_2",
-                            label: "False Answer 2"
-                          }
-                        },
-                        [
-                          _vm._v(
-                            "\n                    " +
-                              _vm._s(props.row.false_answer_2) +
-                              "\n                "
-                          )
+                          _c("p", [
+                            _c("strong", {
+                              domProps: { textContent: _vm._s(_vm.title) }
+                            }),
+                            _vm._v(" "),
+                            _c("br"),
+                            _vm._v(
+                              "\n                        " +
+                                _vm._s(_vm.description) +
+                                "\n                    "
+                            )
+                          ])
                         ]
                       )
-                    ]
-                  }
-                }
-              ])
-            }),
-            _vm._v(" "),
-            _c(
-              "a",
-              { staticClass: "button is-primary", on: { click: _vm.submit } },
-              [_vm._v("Create series")]
-            )
-          ]
-        : _vm._e(),
-      _vm._v(" "),
-      _c("h3", { staticClass: "is-size-5 has-text-info" }, [
-        _vm._v("Start by pasting the Youtube URL you'd like to use below")
-      ]),
-      _vm._v(" "),
-      _c("input", {
-        directives: [
-          {
-            name: "model",
-            rawName: "v-model",
-            value: _vm.url,
-            expression: "url"
-          }
-        ],
-        staticClass: "input is-rounded",
-        attrs: { type: "text", placeholder: "YouTube URL" },
-        domProps: { value: _vm.url },
-        on: {
-          input: [
-            function($event) {
-              if ($event.target.composing) {
-                return
-              }
-              _vm.url = $event.target.value
-            },
-            _vm.onInput
-          ]
-        }
-      }),
-      _vm._v(" "),
-      _c("article", { staticClass: "media" }, [
-        _c("figure", { staticClass: "media-left" }, [
-          _c("p", { staticClass: "image" }, [
-            _c("img", { attrs: { src: _vm.thumb } })
-          ])
-        ]),
-        _vm._v(" "),
-        _vm.title || _vm.description
-          ? _c("div", { staticClass: "media-content" }, [
-              _c(
-                "div",
-                { staticClass: "content" },
-                [
-                  _c(
-                    "b-notification",
-                    { ref: "element", attrs: { closable: false } },
-                    [
-                      _c("p", [
-                        _c("strong", {
-                          domProps: { textContent: _vm._s(_vm.title) }
-                        }),
-                        _vm._v(" "),
-                        _c("br"),
-                        _vm._v(
-                          "\n                        " +
-                            _vm._s(_vm.description) +
-                            "\n                    "
-                        )
-                      ])
-                    ]
+                    ],
+                    1
                   )
-                ],
-                1
-              )
-            ])
-          : _vm._e()
-      ]),
-      _vm._v(" "),
-      _vm.stage2
-        ? _c(
-            "div",
-            { staticClass: "questionblock" },
-            [
-              _c(
-                "b-field",
+                ])
+              : _vm._e()
+          ]),
+          _vm._v(" "),
+          _vm.stage2
+            ? _c(
+                "div",
+                { staticClass: "questionblock" },
                 [
                   _c(
-                    "b-select",
-                    {
-                      attrs: { placeholder: "Choose a category" },
-                      model: {
-                        value: _vm.category,
-                        callback: function($$v) {
-                          _vm.category = $$v
+                    "b-field",
+                    [
+                      _c(
+                        "b-select",
+                        {
+                          attrs: { placeholder: "Choose a category" },
+                          model: {
+                            value: _vm.category,
+                            callback: function($$v) {
+                              _vm.category = $$v
+                            },
+                            expression: "category"
+                          }
                         },
-                        expression: "category"
+                        _vm._l(_vm.categories, function(category) {
+                          return _c("option", {
+                            domProps: {
+                              value: category.id,
+                              textContent: _vm._s(category.name)
+                            }
+                          })
+                        })
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "heading" }, [
+                    _vm._v("Please select the question type.")
+                  ]),
+                  _vm._v(" "),
+                  _vm._l(_vm.types, function(type) {
+                    return _c("button", {
+                      class: _vm.buttonTypeClass(type.type),
+                      domProps: { textContent: _vm._s(type.text) },
+                      on: {
+                        click: function($event) {
+                          _vm.questionType(type.type)
+                        }
                       }
-                    },
-                    _vm._l(_vm.categories, function(category) {
-                      return _c("option", {
-                        domProps: {
-                          value: category.id,
-                          textContent: _vm._s(category.name)
+                    })
+                  })
+                ],
+                2
+              )
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.stage3
+            ? _c(
+                "div",
+                { staticStyle: { "margin-top": "1rem" } },
+                [
+                  _c(
+                    "b-field",
+                    { attrs: { label: "Question to ask" } },
+                    [
+                      _c("b-input", {
+                        attrs: { placeholder: "Question" },
+                        model: {
+                          value: _vm.questionValue,
+                          callback: function($$v) {
+                            _vm.questionValue = $$v
+                          },
+                          expression: "questionValue"
                         }
                       })
-                    })
-                  )
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c("div", { staticClass: "heading" }, [
-                _vm._v("Please select the question type.")
-              ]),
-              _vm._v(" "),
-              _vm._l(_vm.types, function(type) {
-                return _c("button", {
-                  class: _vm.buttonTypeClass(type.type),
-                  domProps: { textContent: _vm._s(type.text) },
-                  on: {
-                    click: function($event) {
-                      _vm.questionType(type.type)
-                    }
-                  }
-                })
-              })
-            ],
-            2
-          )
-        : _vm._e(),
-      _vm._v(" "),
-      _vm.stage3
-        ? _c(
-            "div",
-            { staticStyle: { "margin-top": "1rem" } },
-            [
-              _c(
-                "b-field",
-                { attrs: { label: "Question to ask" } },
-                [
-                  _c("b-input", {
-                    attrs: { placeholder: "Question" },
-                    model: {
-                      value: _vm.questionValue,
-                      callback: function($$v) {
-                        _vm.questionValue = $$v
-                      },
-                      expression: "questionValue"
-                    }
-                  })
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "b-field",
-                { attrs: { label: "The correct answer" } },
-                [
-                  _c("b-input", {
-                    attrs: { placeholder: "Correct answer" },
-                    model: {
-                      value: _vm.correctAnswer,
-                      callback: function($$v) {
-                        _vm.correctAnswer = $$v
-                      },
-                      expression: "correctAnswer"
-                    }
-                  })
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "b-field",
-                { attrs: { label: "False answer one" } },
-                [
-                  _c("b-input", {
-                    attrs: { placeholder: "False answer one" },
-                    model: {
-                      value: _vm.falseOneValue,
-                      callback: function($$v) {
-                        _vm.falseOneValue = $$v
-                      },
-                      expression: "falseOneValue"
-                    }
-                  })
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "b-field",
-                { attrs: { label: "False answer two" } },
-                [
-                  _c("b-input", {
-                    attrs: { placeholder: "False answer two" },
-                    model: {
-                      value: _vm.falseTwoValue,
-                      callback: function($$v) {
-                        _vm.falseTwoValue = $$v
-                      },
-                      expression: "falseTwoValue"
-                    }
-                  })
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "b-field",
-                { attrs: { label: "Start time" } },
-                [
-                  _vm.lengthHours > 1
-                    ? _c(
-                        "b-select",
-                        {
-                          attrs: { placeholder: "Hour" },
-                          model: {
-                            value: _vm.startTime.hour,
-                            callback: function($$v) {
-                              _vm.$set(_vm.startTime, "hour", $$v)
-                            },
-                            expression: "startTime.hour"
-                          }
-                        },
-                        _vm._l(_vm.lengthHours, function(hour) {
-                          return _c(
-                            "option",
-                            { domProps: { value: hour - 1 } },
-                            [
-                              _vm._v(
-                                "\n                    " +
-                                  _vm._s(hour - 1) +
-                                  "\n                "
-                              )
-                            ]
-                          )
-                        })
-                      )
-                    : _vm._e(),
+                    ],
+                    1
+                  ),
                   _vm._v(" "),
-                  _vm.lengthMinutes
-                    ? _c(
-                        "b-select",
-                        {
-                          attrs: { placeholder: "Minute" },
-                          model: {
-                            value: _vm.startTime.minute,
-                            callback: function($$v) {
-                              _vm.$set(_vm.startTime, "minute", $$v)
-                            },
-                            expression: "startTime.minute"
-                          }
-                        },
-                        _vm._l(_vm.lengthMinutes, function(minute) {
-                          return _c(
-                            "option",
-                            { domProps: { value: minute - 1 } },
-                            [
-                              _vm._v(
-                                "\n                    " +
-                                  _vm._s(minute - 1) +
-                                  "\n                "
-                              )
-                            ]
-                          )
-                        })
-                      )
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _vm.lengthSeconds
-                    ? _c(
-                        "b-select",
-                        {
-                          attrs: { placeholder: "Second" },
-                          model: {
-                            value: _vm.startTime.second,
-                            callback: function($$v) {
-                              _vm.$set(_vm.startTime, "second", $$v)
-                            },
-                            expression: "startTime.second"
-                          }
-                        },
-                        _vm._l(_vm.lengthSeconds, function(second) {
-                          return _c(
-                            "option",
-                            { domProps: { value: second - 1 } },
-                            [
-                              _vm._v(
-                                "\n                    " +
-                                  _vm._s(second - 1) +
-                                  "\n                "
-                              )
-                            ]
-                          )
-                        })
-                      )
-                    : _vm._e()
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _vm.type === 1
-                ? _c(
+                  _c(
                     "b-field",
-                    { attrs: { label: "Pause time" } },
+                    { attrs: { label: "The correct answer" } },
+                    [
+                      _c("b-input", {
+                        attrs: { placeholder: "Correct answer" },
+                        model: {
+                          value: _vm.correctAnswer,
+                          callback: function($$v) {
+                            _vm.correctAnswer = $$v
+                          },
+                          expression: "correctAnswer"
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "b-field",
+                    { attrs: { label: "False answer one" } },
+                    [
+                      _c("b-input", {
+                        attrs: { placeholder: "False answer one" },
+                        model: {
+                          value: _vm.falseOneValue,
+                          callback: function($$v) {
+                            _vm.falseOneValue = $$v
+                          },
+                          expression: "falseOneValue"
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "b-field",
+                    { attrs: { label: "False answer two" } },
+                    [
+                      _c("b-input", {
+                        attrs: { placeholder: "False answer two" },
+                        model: {
+                          value: _vm.falseTwoValue,
+                          callback: function($$v) {
+                            _vm.falseTwoValue = $$v
+                          },
+                          expression: "falseTwoValue"
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "b-field",
+                    { attrs: { label: "Start time" } },
                     [
                       _vm.lengthHours > 1
                         ? _c(
@@ -74679,11 +74846,11 @@ var render = function() {
                             {
                               attrs: { placeholder: "Hour" },
                               model: {
-                                value: _vm.pauseTime.hour,
+                                value: _vm.startTime.hour,
                                 callback: function($$v) {
-                                  _vm.$set(_vm.pauseTime, "hour", $$v)
+                                  _vm.$set(_vm.startTime, "hour", $$v)
                                 },
-                                expression: "pauseTime.hour"
+                                expression: "startTime.hour"
                               }
                             },
                             _vm._l(_vm.lengthHours, function(hour) {
@@ -74708,11 +74875,11 @@ var render = function() {
                             {
                               attrs: { placeholder: "Minute" },
                               model: {
-                                value: _vm.pauseTime.minute,
+                                value: _vm.startTime.minute,
                                 callback: function($$v) {
-                                  _vm.$set(_vm.pauseTime, "minute", $$v)
+                                  _vm.$set(_vm.startTime, "minute", $$v)
                                 },
-                                expression: "pauseTime.minute"
+                                expression: "startTime.minute"
                               }
                             },
                             _vm._l(_vm.lengthMinutes, function(minute) {
@@ -74737,11 +74904,11 @@ var render = function() {
                             {
                               attrs: { placeholder: "Second" },
                               model: {
-                                value: _vm.pauseTime.second,
+                                value: _vm.startTime.second,
                                 callback: function($$v) {
-                                  _vm.$set(_vm.pauseTime, "second", $$v)
+                                  _vm.$set(_vm.startTime, "second", $$v)
                                 },
-                                expression: "pauseTime.second"
+                                expression: "startTime.second"
                               }
                             },
                             _vm._l(_vm.lengthSeconds, function(second) {
@@ -74761,140 +74928,238 @@ var render = function() {
                         : _vm._e()
                     ],
                     1
-                  )
-                : _vm._e(),
-              _vm._v(" "),
-              _c(
-                "b-field",
-                { attrs: { label: "End time" } },
-                [
-                  _vm.lengthHours > 1
+                  ),
+                  _vm._v(" "),
+                  _vm.type === 1
                     ? _c(
-                        "b-select",
-                        {
-                          attrs: { placeholder: "Hour" },
-                          model: {
-                            value: _vm.endTime.hour,
-                            callback: function($$v) {
-                              _vm.$set(_vm.endTime, "hour", $$v)
-                            },
-                            expression: "endTime.hour"
-                          }
-                        },
-                        _vm._l(_vm.lengthHours, function(hour) {
-                          return _c(
-                            "option",
-                            { domProps: { value: hour - 1 } },
-                            [
-                              _vm._v(
-                                "\n                    " +
-                                  _vm._s(hour - 1) +
-                                  "\n                "
+                        "b-field",
+                        { attrs: { label: "Pause time" } },
+                        [
+                          _vm.lengthHours > 1
+                            ? _c(
+                                "b-select",
+                                {
+                                  attrs: { placeholder: "Hour" },
+                                  model: {
+                                    value: _vm.pauseTime.hour,
+                                    callback: function($$v) {
+                                      _vm.$set(_vm.pauseTime, "hour", $$v)
+                                    },
+                                    expression: "pauseTime.hour"
+                                  }
+                                },
+                                _vm._l(_vm.lengthHours, function(hour) {
+                                  return _c(
+                                    "option",
+                                    { domProps: { value: hour - 1 } },
+                                    [
+                                      _vm._v(
+                                        "\n                    " +
+                                          _vm._s(hour - 1) +
+                                          "\n                "
+                                      )
+                                    ]
+                                  )
+                                })
                               )
-                            ]
-                          )
-                        })
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _vm.lengthMinutes
+                            ? _c(
+                                "b-select",
+                                {
+                                  attrs: { placeholder: "Minute" },
+                                  model: {
+                                    value: _vm.pauseTime.minute,
+                                    callback: function($$v) {
+                                      _vm.$set(_vm.pauseTime, "minute", $$v)
+                                    },
+                                    expression: "pauseTime.minute"
+                                  }
+                                },
+                                _vm._l(_vm.lengthMinutes, function(minute) {
+                                  return _c(
+                                    "option",
+                                    { domProps: { value: minute - 1 } },
+                                    [
+                                      _vm._v(
+                                        "\n                    " +
+                                          _vm._s(minute - 1) +
+                                          "\n                "
+                                      )
+                                    ]
+                                  )
+                                })
+                              )
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _vm.lengthSeconds
+                            ? _c(
+                                "b-select",
+                                {
+                                  attrs: { placeholder: "Second" },
+                                  model: {
+                                    value: _vm.pauseTime.second,
+                                    callback: function($$v) {
+                                      _vm.$set(_vm.pauseTime, "second", $$v)
+                                    },
+                                    expression: "pauseTime.second"
+                                  }
+                                },
+                                _vm._l(_vm.lengthSeconds, function(second) {
+                                  return _c(
+                                    "option",
+                                    { domProps: { value: second - 1 } },
+                                    [
+                                      _vm._v(
+                                        "\n                    " +
+                                          _vm._s(second - 1) +
+                                          "\n                "
+                                      )
+                                    ]
+                                  )
+                                })
+                              )
+                            : _vm._e()
+                        ],
+                        1
                       )
                     : _vm._e(),
                   _vm._v(" "),
-                  _vm.lengthMinutes
-                    ? _c(
-                        "b-select",
-                        {
-                          attrs: { placeholder: "Minute" },
-                          model: {
-                            value: _vm.endTime.minute,
-                            callback: function($$v) {
-                              _vm.$set(_vm.endTime, "minute", $$v)
+                  _c(
+                    "b-field",
+                    { attrs: { label: "End time" } },
+                    [
+                      _vm.lengthHours > 1
+                        ? _c(
+                            "b-select",
+                            {
+                              attrs: { placeholder: "Hour" },
+                              model: {
+                                value: _vm.endTime.hour,
+                                callback: function($$v) {
+                                  _vm.$set(_vm.endTime, "hour", $$v)
+                                },
+                                expression: "endTime.hour"
+                              }
                             },
-                            expression: "endTime.minute"
-                          }
-                        },
-                        _vm._l(_vm.lengthMinutes, function(minute) {
-                          return _c(
-                            "option",
-                            { domProps: { value: minute - 1 } },
-                            [
-                              _vm._v(
-                                "\n                    " +
-                                  _vm._s(minute - 1) +
-                                  "\n                "
+                            _vm._l(_vm.lengthHours, function(hour) {
+                              return _c(
+                                "option",
+                                { domProps: { value: hour - 1 } },
+                                [
+                                  _vm._v(
+                                    "\n                    " +
+                                      _vm._s(hour - 1) +
+                                      "\n                "
+                                  )
+                                ]
                               )
-                            ]
+                            })
                           )
-                        })
-                      )
-                    : _vm._e(),
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _vm.lengthMinutes
+                        ? _c(
+                            "b-select",
+                            {
+                              attrs: { placeholder: "Minute" },
+                              model: {
+                                value: _vm.endTime.minute,
+                                callback: function($$v) {
+                                  _vm.$set(_vm.endTime, "minute", $$v)
+                                },
+                                expression: "endTime.minute"
+                              }
+                            },
+                            _vm._l(_vm.lengthMinutes, function(minute) {
+                              return _c(
+                                "option",
+                                { domProps: { value: minute - 1 } },
+                                [
+                                  _vm._v(
+                                    "\n                    " +
+                                      _vm._s(minute - 1) +
+                                      "\n                "
+                                  )
+                                ]
+                              )
+                            })
+                          )
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _vm.lengthSeconds
+                        ? _c(
+                            "b-select",
+                            {
+                              attrs: { placeholder: "Second" },
+                              model: {
+                                value: _vm.endTime.second,
+                                callback: function($$v) {
+                                  _vm.$set(_vm.endTime, "second", $$v)
+                                },
+                                expression: "endTime.second"
+                              }
+                            },
+                            _vm._l(_vm.lengthSeconds, function(second) {
+                              return _c(
+                                "option",
+                                { domProps: { value: second - 1 } },
+                                [
+                                  _vm._v(
+                                    "\n                    " +
+                                      _vm._s(second - 1) +
+                                      "\n                "
+                                  )
+                                ]
+                              )
+                            })
+                          )
+                        : _vm._e()
+                    ],
+                    1
+                  ),
                   _vm._v(" "),
-                  _vm.lengthSeconds
+                  _c("youtube", {
+                    ref: "youtube",
+                    staticStyle: { "margin-top": "1rem" },
+                    attrs: {
+                      "video-id": _vm.videoID,
+                      "player-vars": _vm.playerVars
+                    },
+                    on: { ended: _vm.ended }
+                  }),
+                  _vm._v(" "),
+                  _c("br"),
+                  _vm._v(" "),
+                  _c(
+                    "a",
+                    {
+                      staticClass: "button is-primary",
+                      on: { click: _vm.appendToSeries }
+                    },
+                    [_vm._v("Add more quizzes to series")]
+                  ),
+                  _vm._v(" "),
+                  !_vm.series.length
                     ? _c(
-                        "b-select",
+                        "a",
                         {
-                          attrs: { placeholder: "Second" },
-                          model: {
-                            value: _vm.endTime.second,
-                            callback: function($$v) {
-                              _vm.$set(_vm.endTime, "second", $$v)
-                            },
-                            expression: "endTime.second"
-                          }
+                          staticClass: "button is-primary",
+                          on: { click: _vm.submit }
                         },
-                        _vm._l(_vm.lengthSeconds, function(second) {
-                          return _c(
-                            "option",
-                            { domProps: { value: second - 1 } },
-                            [
-                              _vm._v(
-                                "\n                    " +
-                                  _vm._s(second - 1) +
-                                  "\n                "
-                              )
-                            ]
-                          )
-                        })
+                        [_vm._v("Create")]
                       )
                     : _vm._e()
                 ],
                 1
-              ),
-              _vm._v(" "),
-              _c("youtube", {
-                ref: "youtube",
-                staticStyle: { "margin-top": "1rem" },
-                attrs: {
-                  "video-id": _vm.videoID,
-                  "player-vars": _vm.playerVars
-                },
-                on: { ended: _vm.ended }
-              }),
-              _vm._v(" "),
-              _c("br"),
-              _vm._v(" "),
-              _c(
-                "a",
-                {
-                  staticClass: "button is-primary",
-                  on: { click: _vm.appendToSeries }
-                },
-                [_vm._v("Add more quizzes to series")]
-              ),
-              _vm._v(" "),
-              !_vm.series.length
-                ? _c(
-                    "a",
-                    {
-                      staticClass: "button is-primary",
-                      on: { click: _vm.submit }
-                    },
-                    [_vm._v("Create")]
-                  )
-                : _vm._e()
-            ],
-            1
-          )
-        : _vm._e()
+              )
+            : _vm._e()
+        ],
+        2
+      )
     ],
-    2
+    1
   )
 }
 var staticRenderFns = []

@@ -1,30 +1,46 @@
 <template>
-    <div class="columns">
-        <div class="column is-8-desktop is-10-tablet is-12-mobile">
-
-            <p class="panel-tabs">
-                <a :class="{'is-active': sort == 'new'}" @click="changeSort('new')">new</a>
-                <a :class="{'is-active': sort == 'hot'}" @click="changeSort('hot')">hot</a>
-                <a :class="{'is-active': sort == 'voted'}" @click="changeSort('voted')">most voted</a>
-            </p>
+    <div class="content-wrapper">
+        <div class="subheader">Sort by -
+            <span @click="changeSort('new')" :class="{'is-active': sort == 'new'}" style="cursor: pointer">
+                <i class="fas fa-sun"></i>
+                new -
+            </span>
+            <span @click="changeSort('voted')" :class="{'is-active': sort == 'voted'}" style="cursor: pointer">
+            <i class="fas fa-rocket"></i>
+            best -
+            </span>
+            <span @click="changeSort('hot')" :class="{'is-active': sort == 'hot'}" style="cursor: pointer">
+            <i class="fab fa-hotjar"></i>
+            hot
+            </span>
+        </div>
+        <div class="maincontent">
+            <!--<div class="column is-8-desktop is-10-tablet is-12-mobile">-->
+            <!--<p class="panel-tabs">-->
+            <!--<a :class="{'is-active': sort == 'new'}" @click="changeSort('new')">new</a>-->
+            <!--<a :class="{'is-active': sort == 'hot'}" @click="changeSort('hot')">hot</a>-->
+            <!--<a :class="{'is-active': sort == 'voted'}" @click="changeSort('voted')">most voted</a>-->
+            <!--</p>-->
             <quiz v-for="(quiz, index) in quizzes" @upvoteQuiz="upvoteQuiz"
                   @downvoteQuiz="downvoteQuiz"
                   :key="index" :content="quiz" @expanded="visitQuizPage(quiz)">
             </quiz>
-        </div>
-        <div class="column is-4-desktop is-2-tablet is-12-mobile" v-if="filteredByChannel">
-            <article class="message is-info">
-                <div class="message-header">
-                    <p v-text="this.$route.params.subreddit"></p>
-                </div>
-                <div class="message-body">
-                    You are browsing <b>{{ $route.params.subreddit }}</b> channel.
-                    <br>
-                    If you want to go back, <a href="#" @click.prevent="toHomepage">click here.</a>
-                </div>
-            </article>
+            <!--</div>-->
+            <!--<div class="column is-4-desktop is-2-tablet is-12-mobile" v-if="filteredByChannel">-->
+            <!--<article class="message is-info">-->
+            <!--<div class="message-header">-->
+            <!--<p v-text="this.$route.params.subreddit"></p>-->
+            <!--</div>-->
+            <!--<div class="message-body">-->
+            <!--You are browsing <b>{{ $route.params.subreddit }}</b> channel.-->
+            <!--<br>-->
+            <!--If you want to go back, <a href="#" @click.prevent="toHomepage">click here.</a>-->
+            <!--</div>-->
+            <!--</article>-->
+            <!--</div>-->
         </div>
     </div>
+
 
 
 </template>
@@ -172,7 +188,9 @@
         justify-content: start;
         margin-bottom: 1px;
     }
-
+    .is-active {
+        color: red;
+    }
     .card {
         margin-bottom: 2rem;
     }
