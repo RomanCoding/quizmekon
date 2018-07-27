@@ -125,8 +125,9 @@ return [
     */
 
     'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
+        'category_id' => [
+            'required' => 'Select category',
+            'exists' => 'This category does not exists',
         ],
     ],
 

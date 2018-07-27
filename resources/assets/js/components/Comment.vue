@@ -159,7 +159,7 @@
                 let self = this;
                 axios.patch('/comments/' + this.comment.id + '/vote').then((r) => {
                     if (!self.comment.usersVote || self.comment.usersVote.updated_at !== r.data.updated_at) {
-                        self.comment.votesTotal += (self.comment.hasOwnProperty('usersVote') && self.comment.usersVote) ? 2 : 1;
+                        self.comment.votesTotal -= (self.comment.hasOwnProperty('usersVote') && self.comment.usersVote) ? 2 : 1;
                     }
                     self.comment.usersVote = r.data;
                 }).catch((e) => {

@@ -1,19 +1,16 @@
 <template>
     <div class="columns">
         <div class="column is-8-desktop is-10-tablet is-12-mobile">
-            <!--<b-modal :active.sync="isComponentModalActive" scroll="keep">-->
-            <!--<post-modal :content="expandedPost" @upvotePost="upvotePost" @downvotePost="downvotePost"></post-modal>-->
-            <!--</b-modal>-->
 
             <p class="panel-tabs">
                 <a :class="{'is-active': sort == 'new'}" @click="changeSort('new')">new</a>
                 <a :class="{'is-active': sort == 'hot'}" @click="changeSort('hot')">hot</a>
                 <a :class="{'is-active': sort == 'voted'}" @click="changeSort('voted')">most voted</a>
             </p>
-            <post v-for="(post, index) in posts" @upvotePost="upvotePost"
-                  @downvotePost="downvotePost"
-                  :key="index" :content="post" @expanded="visitPostPage(post)">
-            </post>
+            <quiz v-for="(quiz, index) in quizzes" @upvoteQuiz="upvoteQuiz"
+                  @downvoteQuiz="downvoteQuiz"
+                  :key="index" :content="quiz" @expanded="visitQuizPage(quiz)">
+            </quiz>
         </div>
         <div class="column is-4-desktop is-2-tablet is-12-mobile" v-if="filteredByChannel">
             <article class="message is-info">
@@ -33,19 +30,17 @@
 </template>
 
 <script>
-    import Post from './Post.vue'
-    import PostModal from './PostModal.vue'
+    import Quiz from './Quiz.vue'
     export default {
         components: {
-            'post': Post,
-            'post-modal': PostModal
+            'quiz': Quiz,
         },
         data() {
             return {
                 sort: 'new',
-                posts: [],
+                quizzes: [],
                 page: 1,
-                expandedPost: null,
+                expandedQuiz: null,
                 isComponentModalActive: false,
             };
         },
@@ -86,38 +81,40 @@
             },
             loadMore(replace = false) {
                 let self = this;
-                axios.get('/posts', {
+                axios.get('/quizzes', {
                     params: {
                         s: this.sort,
                         page: this.page,
                         category: this.$route.params.subreddit
                     }
                 }).then((r) => {
-                    self.posts = replace ? r.data.data : self.posts.concat(r.data.data || []);
-                    self.page++;
+                    self.quizzes = replace ? r.data.data : self.quizzes.concat(r.data.data || []);
+                    if (r.data.data.length) {
+                        self.page++;
+                    }
                 });
             },
-            visitPostPage(post) {
-                this.$router.push({path: '/r/' + post.category.slug + '/' + post.id});
+            visitQuizPage(quiz) {
+                this.$router.push({path: '/r/' + quiz.category.slug + '/' + quiz.id});
             },
             toHomepage() {
                 this.$router.push({path: '/' + (this.$route.params.sort || 'new')});
             },
-            upvotePost(post) {
-                if (post.usersVote && post.usersVote.value === 1) {
+            upvoteQuiz(quiz) {
+                if (quiz.usersVote && quiz.usersVote.value === 1) {
                     return;
                 }
                 let self = this;
-                axios.patch('/posts/' + post.id + '/vote', {
+                axios.patch('/quizzes/' + quiz.id + '/vote', {
                     up: 1
                 }).then((r) => {
-                    let postIndex = self.posts.findIndex((p) => p.id === post.id);
-                    if (!post.usersVote || post.usersVote.updated_at !== r.data.updated_at) {
-                        post.votesTotal += (post.hasOwnProperty('usersVote') && post.usersVote) ? 2 : 1;
+                    let quizIndex = self.quizzes.findIndex((q) => q.id === quiz.id);
+                    if (!quiz.usersVote || quiz.usersVote.updated_at !== r.data.updated_at) {
+                        quiz.votesTotal += (quiz.hasOwnProperty('usersVote') && quiz.usersVote) ? 2 : 1;
                     }
-                    post.usersVote = r.data;
-                    if (postIndex > -1) {
-                        self.posts[postIndex] = post;
+                    quiz.usersVote = r.data;
+                    if (quizIndex > -1) {
+                        self.quizzes[quizIndex] = quiz;
                     }
                 }).catch((e) => {
                     switch (e.response.status) {
@@ -136,19 +133,19 @@
                     }
                 });
             },
-            downvotePost(post) {
+            downvoteQuiz(quiz) {
                 let self = this;
-                if (post.usersVote && post.usersVote.value === -1) {
+                if (quiz.usersVote && quiz.usersVote.value === -1) {
                     return;
                 }
-                axios.patch('/posts/' + post.id + '/vote').then((r) => {
-                    let postIndex = self.posts.findIndex((p) => p.id === post.id);
-                    if (!post.usersVote || post.usersVote.updated_at !== r.data.updated_at) {
-                        post.votesTotal -= (post.hasOwnProperty('usersVote') && post.usersVote) ? 2 : 1;
+                axios.patch('/quizzes/' + quiz.id + '/vote').then((r) => {
+                    let quizIndex = self.quizzes.findIndex((p) => p.id === quiz.id);
+                    if (!quiz.usersVote || quiz.usersVote.updated_at !== r.data.updated_at) {
+                        quiz.votesTotal -= (quiz.hasOwnProperty('usersVote') && quiz.usersVote) ? 2 : 1;
                     }
-                    post.usersVote = r.data;
-                    if (postIndex > -1) {
-                        self.posts[postIndex] = post;
+                    quiz.usersVote = r.data;
+                    if (quizIndex > -1) {
+                        self.quizzes[quizIndex] = quiz;
                     }
                 }).catch((e) => {
                     switch (e.response.status) {

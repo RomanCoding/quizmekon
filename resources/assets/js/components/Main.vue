@@ -1,14 +1,14 @@
 <template>
     <div>
-        <posts></posts>
+        <quizzes></quizzes>
     </div>
 </template>
 
 <script>
-    import Posts from './Posts.vue'
+    import Quizzes from './Quizzes.vue'
     export default {
         components: {
-            'posts': Posts,
+            'quizzes': Quizzes,
         },
         data() {
             return {

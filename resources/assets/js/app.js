@@ -10,30 +10,30 @@ require('./bootstrap');
 window.Vue = require('vue');
 window.moment = require('moment');
 
-import VueRouter from 'vue-router'
+import VueRouter from 'vue-router';
+import VueYoutube from 'vue-youtube';
 
 import Vue from 'vue';
 export const EventBus = new Vue();
 window.Event = EventBus;
 
+Vue.use(VueYoutube)
 Vue.use(VueRouter)
 
 import Buefy from 'buefy'
 import 'buefy/lib/buefy.css'
 
-
-
-
-
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faArrowCircleDown } from '@fortawesome/free-solid-svg-icons'
 import { faArrowCircleUp } from '@fortawesome/free-solid-svg-icons'
 import { faCommentAlt } from '@fortawesome/free-solid-svg-icons'
+import { faFlag } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(faArrowCircleDown)
 library.add(faArrowCircleUp)
 library.add(faCommentAlt)
+library.add(faFlag)
 
 window.Vue.use(Buefy)
 
@@ -51,7 +51,7 @@ Vue.component('site-header', require('./components/Header.vue'));
 import authMixin from './mixins/auth'
 
 import Main from './components/Main.vue'
-import PostPage from './components/PostPage.vue'
+import QuizPage from './components/QuizPage.vue'
 import CreatePost from './components/CreatePost.vue'
 import Login from './components/Login.vue'
 
@@ -59,7 +59,7 @@ const routes = [
     { path: '/submit', component: CreatePost, meta: { requiresAuth: true}},
     { path: '/login', component: Login },
     { path: '/:sort?', component: Main },
-    { path: '/r/:subreddit/:post(\\d+)', component: PostPage },
+    { path: '/r/:subreddit/:quiz(\\d+)', component: QuizPage },
     { path: '/r/:subreddit/:sort?', component: Main },
 ];
 const router = new VueRouter({

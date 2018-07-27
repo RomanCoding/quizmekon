@@ -3,92 +3,45 @@
 namespace App\Http\Controllers;
 
 use App\Comment;
-use App\Post;
+use App\Http\Requests\StoreComment;
+use App\Quiz;
 use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @param Post $post
-     * @return \Illuminate\Http\Response
-     */
-    public function index(Post $post)
+    public function index(Quiz $quiz)
     {
-        return $post->comments;
+        return $quiz->comments;
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Add a comment to the quiz.
      *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     *
-     * @param Post $post
-     * @param  \Illuminate\Http\Request $request
+     * @param Quiz $quiz
+     * @param StoreComment $request
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function storePost(Post $post, Request $request)
+    public function storeQuiz(Quiz $quiz, StoreComment $request)
     {
-        return $post->comments()->create([
+        return $quiz->comments()->create([
             'user_id' => $request->user()->id,
-            'body' => $request->get('body'),
+            'body' => $request->body,
         ])->loadMissing('user');
     }
 
     /**
+     * Add a comment to another quiz.
      *
      * @param Comment $comment
-     * @param  \Illuminate\Http\Request $request
+     * @param StoreComment $request
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function storeComment(Comment $comment, Request $request)
+    public function storeComment(Comment $comment, StoreComment $request)
     {
         return $comment->comments()->create([
             'user_id' => $request->user()->id,
             'body' => $request->get('body'),
         ])->loadMissing('user');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Comment  $comment
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Comment $comment)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Comment  $comment
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Comment $comment)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Comment  $comment
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Comment $comment)
-    {
-        //
     }
 
     /**

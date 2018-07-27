@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Comment;
 use App\Post;
+use App\Quiz;
 use Illuminate\Http\Request;
 
 class VoteController extends Controller
@@ -12,11 +13,11 @@ class VoteController extends Controller
      * Give an up- or down- vote for a post.
      *
      * @param Request $request
-     * @param Post $post
+     * @param Quiz $quiz
      */
-    public function updatePost(Request $request, Post $post)
+    public function updateQuiz(Request $request, Quiz $quiz)
     {
-        return $request->user()->voteForPost($post, $request->get('up', -1));
+        return $request->user()->voteForQuiz($quiz, $request->get('up', -1));
     }
 
     /**

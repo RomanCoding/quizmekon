@@ -9,7 +9,7 @@
         <div class="container">
             <div class="navbar-brand">
                 <a class="navbar-item" href="/">
-                    Meddit
+                    Quizmekon
                 </a>
                 <span class="navbar-burger burger" data-target="navMenu">
             <span></span>
@@ -29,8 +29,7 @@
                                 {{ this.$parent.user.username }}
                                 <b-icon icon="menu-down"></b-icon>
                             </a>
-
-                            <b-dropdown-item>Preferences</b-dropdown-item>
+                            <b-dropdown-item title="Poll quizzes to get experience">Experience: {{ this.$parent.user.experience }}</b-dropdown-item>
                             <b-dropdown-item @click="createPost">Add new</b-dropdown-item>
                             <b-dropdown-item @click="logout">Logout</b-dropdown-item>
                         </b-dropdown>

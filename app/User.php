@@ -27,14 +27,37 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-    public function voteForPost(Post $post, $vote = -1)
+    public function voteForQuiz(Quiz $quiz, $vote = -1)
     {
-        return $post->votes()->updateOrCreate([
+        return $quiz->votes()->updateOrCreate([
             'user_id' => $this->id,
         ], [
             'user_id' => $this->id,
             'value' => $vote
         ]);
+    }
+
+    /**
+     * Check if user has polled in given quiz.
+     *
+     * @param Quiz $quiz
+     * @return bool
+     */
+    public function hasPolledForQuiz(Quiz $quiz)
+    {
+        return (bool) $quiz->polls()
+            ->where('user_id', $this->id)
+            ->count();
+    }
+
+    public function poll(Quiz $quiz, $index)
+    {
+        return $quiz->polls()->firstOrCreate([
+            'user_id' => $this->id,
+        ], [
+            'user_id' => $this->id,
+            'index' => $index
+        ])->setAttribute('correct', $quiz->correct_index);
     }
 
     public function voteForComment(Comment $comment, $vote = -1)

@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use App\Exceptions\Youtube\NotFoundException;
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
@@ -46,6 +47,11 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if ($exception instanceof NotFoundException) {
+            return response()->json([
+                'message' => $exception->getMessage()
+            ], $exception->getCode());
+        }
         return parent::render($request, $exception);
     }
 }

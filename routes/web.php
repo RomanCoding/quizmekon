@@ -11,23 +11,37 @@
 |
 */
 
+Route::post('/youtube/search', 'YoutubeController@search');
+Route::post('/youtube/videos', 'YoutubeController@videos');
+
+
+Route::group(['middleware' => 'auth'], function() {
+    Route::post('/quizzes', 'QuizController@store');
+    Route::post('/quizzes/bulk', 'QuizController@storeBulk');
+
+    Route::post('/polls/{quiz}', 'PollController@store');
+
+    Route::patch('/quizzes/{quiz}/vote', 'VoteController@updateQuiz')->middleware('confirmed');
+    Route::patch('/comments/{comment}/vote', 'VoteController@updateComment')->middleware('confirmed');
+
+    Route::post('/comments/quiz/{quiz}', 'CommentController@storeQuiz')->middleware(['cd.comment', 'confirmed']);
+    Route::post('/comments/comment/{comment}', 'CommentController@storeComment')->middleware(['cd.comment', 'confirmed']);
+
+    Route::get('/comments/{post}', 'CommentController@index');
+});
+
+
+
 
 Route::get('/verifyemail/{token}', 'Auth\RegisterController@verify');
 
 Route::post('/login/check', 'Auth\LoginController@checkIfCorrect');
 
 Route::get('/categories', 'CategoryController@index');
-Route::get('/posts', 'PostController@index');
-Route::post('/posts', 'PostController@store')->middleware(['cd.post', 'confirmed']);
-Route::get('/posts/{post}', 'PostController@show');
+Route::get('/quizzes', 'QuizController@index');
+Route::get('/quizzes/{quiz}', 'QuizController@show');
 
-Route::get('/comments/{post}', 'CommentController@index');
 
-Route::post('/comments/post/{post}', 'CommentController@storePost')->middleware(['cd.comment', 'confirmed']);
-Route::post('/comments/comment/{comment}', 'CommentController@storeComment')->middleware(['cd.comment', 'confirmed']);
-
-Route::patch('/posts/{post}/vote', 'VoteController@updatePost')->middleware('confirmed');
-Route::patch('/comments/{comment}/vote', 'VoteController@updateComment')->middleware('confirmed');
 
 Route::post('/register/email', 'Auth\RegisterController@checkUniqueEmail');
 Route::post('/register/username', 'Auth\RegisterController@checkUniqueUsername');

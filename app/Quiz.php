@@ -3,71 +3,40 @@
 namespace App;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Str;
 
-class Post extends Model
+class Quiz extends Model
 {
-    protected $with = ['category', 'votes', 'user'];
+    protected $fillable = [
+        'video_id',
+        'type',
+        'question',
+        'answers',
+        'correct_index',
+        'category_id',
+        'user_id',
+        'series_id',
+        'order'
+    ];
+
+    protected $hidden = ['correct_index'];
+
+    protected $with = ['video', 'category', 'votes', 'user'];
 
     protected $appends = ['usersVote', 'votesTotal'];
 
-    protected $guarded = [];
+    protected $casts = [
+        'answers' => 'array',
+    ];
 
-    const POST = 0;
-    const LINK = 1;
-    const YOUTUBE = 2;
-
-    public static function boot() {
-        parent::boot();
-
-        static::created(function (Post $post) {
-            $post->votes()->create([
-                'user_id' => $post->user_id,
-                'value' => 1
-            ]);
-            $post->updateScore();
-        });
-
-//        static::updating(function (Post $post) {
-//            $post->updateScore();
-//        });
-
-
-    }
-
-    /**
-     * Post belongs to a category (channel / subreddit)
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function category()
-    {
-        return $this->belongsTo(Category::class);
-    }
-
-    /**
-     * Post belongs to a user
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    /**
-     * Post has votes.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
-     */
-    public function votes()
-    {
-        return $this->morphMany('App\Vote', 'voteable')->orderByDesc('id');
-    }
+    // these are types of questions, integer values for storing in database
+    const WHAT_HAPPENS_NEXT = 1;
+    const QUESTION_THEN_VIDEO = 2;
+    const VIDEO_THEN_QUESTION = 3;
 
     /**
      * Post has comments.
@@ -79,8 +48,63 @@ class Post extends Model
         return $this->morphMany('App\Comment', 'commentable')->orderByDesc('id');
     }
 
+    public function video()
+    {
+        return $this->belongsTo(Video::class);
+    }
+
+    public function series()
+    {
+        return $this->belongsTo(Series::class);
+    }
+
     /**
-     * Check if given user has voted for this post.
+     * Quiz belongs to a category
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Quiz has votes.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function votes()
+    {
+        return $this->morphMany(Vote::class, 'voteable')->orderByDesc('id');
+    }
+
+    /**
+     * Quiz belongs to a user
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function polls()
+    {
+        return $this->hasMany(Poll::class);
+    }
+
+    public function getVotesTotalAttribute()
+    {
+        return $this->votes->sum('value');
+    }
+
+    public function getCorrectAttribute()
+    {
+        return $this->usersPoll ? $this->correct_index : null;
+    }
+
+    /**
+     * Check if auth user has voted for this quiz.
      *
      * @return Model|null|object|static
      */
@@ -89,14 +113,14 @@ class Post extends Model
         return auth()->user() ? $this->votes->where('user_id', auth()->user()->id)->first() : null;
     }
 
-    public function getVotesTotalAttribute()
+    /**
+     * Check if auth user participated in poll.
+     *
+     * @return Model|null|object|static
+     */
+    public function getUsersPollAttribute()
     {
-        return $this->votes->sum('value');
-    }
-
-    public function scopeInSevenMinutes($query)
-    {
-        return $query->where('created_at', '>=', Carbon::now()->subMinutes(7));
+        return auth()->user() ? $this->polls->where('user_id', auth()->user()->id)->first() : null;
     }
 
     /**
