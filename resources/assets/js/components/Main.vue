@@ -86,6 +86,9 @@
         },
         mounted() {
         },
+        created() {
+
+        },
         computed: {
             filteredByChannel() {
                 return this.$route.params.subreddit;
@@ -97,7 +100,16 @@
                 this.$router.push({path: '/' + (this.$route.params.sort || 'new')});
             },
             createPost() {
-                this.$router.push({path: '/submit'});
+                if (this.$parent.user && !this.$parent.user.confirmed) {
+                    this.$toast.open({
+                        duration: 5000,
+                        message: "Please confirm your registration by acknowledging the email we have sent to " + this.$parent.user.email,
+                        position: 'is-top',
+                        type: 'is-danger'
+                    });
+                } else {
+                    this.$router.push({path: '/submit'});
+                }
             },
         }
     }

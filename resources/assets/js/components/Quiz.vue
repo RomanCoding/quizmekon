@@ -18,7 +18,7 @@
             <div class="media-content">
                 <div class="content">
                     <p>
-                        <strong class="is-size-5" v-text="quiz.question" @click="$emit('expanded')"></strong>
+                        <strong class="is-size-5" v-text="quiz.title" @click="$emit('expanded')"></strong>
                         <br>
                         <span class="is-size-7 has-text-grey-light"> posted to: </span>
                         <span class="has-text-weight-bold pointer" v-text="quiz.category.name" @click="visitCategory"></span>

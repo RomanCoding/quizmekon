@@ -21,6 +21,7 @@ class CreateQuizzesTable extends Migration
             $table->unsignedInteger('series_id')->nullable();
             $table->unsignedTinyInteger('order')->nullable();
             $table->unsignedInteger('category_id');
+            $table->string('title');
             $table->string('question');
             $table->text('answers');
             $table->unsignedTinyInteger('correct_index');

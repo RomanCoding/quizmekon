@@ -7578,10 +7578,20 @@ var _iconsCache = {
 var authMixin = {
     methods: {
         checkIfLogged: function checkIfLogged() {
+            var _this = this;
+
             var vm = this;
             return new Promise(function (resolve, reject) {
                 axios.get('/sessionStatus').then(function (response) {
                     window.user = response.data.user;
+                    if (response.data.user && response.data.user.showFirstTime) {
+                        _this.$toast.open({
+                            duration: 10000,
+                            message: "Welcome, please confirm your registration by acknowledging the email we have sent to " + response.data.user.email,
+                            position: 'is-top',
+                            type: 'is-danger'
+                        });
+                    }
                     resolve(response.data.user);
                 }).catch(function (error) {
                     window.user = null;
@@ -70679,7 +70689,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
@@ -70778,6 +70788,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         return {};
     },
     mounted: function mounted() {},
+    created: function created() {},
 
     computed: {
         filteredByChannel: function filteredByChannel() {
@@ -70790,7 +70801,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.$router.push({ path: '/' + (this.$route.params.sort || 'new') });
         },
         createPost: function createPost() {
-            this.$router.push({ path: '/submit' });
+            if (this.$parent.user && !this.$parent.user.confirmed) {
+                this.$toast.open({
+                    duration: 5000,
+                    message: "Please confirm your registration by acknowledging the email we have sent to " + this.$parent.user.email,
+                    position: 'is-top',
+                    type: 'is-danger'
+                });
+            } else {
+                this.$router.push({ path: '/submit' });
+            }
         }
     }
 });
@@ -70960,6 +70980,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         this.changeSort(this.$route.params.sort || this.sort);
         this.loadMore();
         var self = this;
+
         $(window).on('scroll', function () {
             if ($(window).scrollTop() > $(document).height() - $(window).height() - 1) {
                 self.loadMore();
@@ -71347,7 +71368,7 @@ var render = function() {
           _c("p", [
             _c("strong", {
               staticClass: "is-size-5",
-              domProps: { textContent: _vm._s(_vm.quiz.question) },
+              domProps: { textContent: _vm._s(_vm.quiz.title) },
               on: {
                 click: function($event) {
                   _vm.$emit("expanded")
@@ -71783,7 +71804,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
@@ -71799,6 +71820,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__modals_Login_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__modals_Login_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__modals_Registration_vue__ = __webpack_require__(223);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__modals_Registration_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__modals_Registration_vue__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -71919,9 +71950,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         toggleSignUpModal: function toggleSignUpModal(event) {
             event.preventDefault();
             window.Event.$emit('signup-modal');
-        },
-        createPost: function createPost() {
-            this.$router.push({ path: '/submit' });
         },
         logout: function logout() {
             this.$refs.logoutForm.submit();
@@ -72725,10 +72753,64 @@ var render = function() {
                     ]
                   : this.$parent.$parent.user
                     ? [
-                        _vm._v(
-                          "\n                    " +
-                            _vm._s(this.$parent.$parent.user.username) +
-                            "\n                "
+                        _c(
+                          "b-dropdown",
+                          [
+                            _c(
+                              "a",
+                              {
+                                staticClass: "navbar-item",
+                                attrs: { slot: "trigger" },
+                                slot: "trigger"
+                              },
+                              [
+                                _vm._v(
+                                  "\n                            " +
+                                    _vm._s(this.$parent.$parent.user.username) +
+                                    "\n                            "
+                                ),
+                                _c("b-icon", { attrs: { icon: "menu-down" } })
+                              ],
+                              1
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "b-dropdown-item",
+                              {
+                                attrs: {
+                                  title: "Poll quizzes to get experience"
+                                }
+                              },
+                              [
+                                _vm._v(
+                                  "Experience: " +
+                                    _vm._s(this.$parent.$parent.user.experience)
+                                )
+                              ]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "b-dropdown-item",
+                              { on: { click: _vm.logout } },
+                              [_vm._v("Logout")]
+                            )
+                          ],
+                          1
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "form",
+                          {
+                            ref: "logoutForm",
+                            staticStyle: { display: "none" },
+                            attrs: { action: "/logout", method: "POST" }
+                          },
+                          [
+                            _c("input", {
+                              attrs: { type: "hidden", name: "_token" },
+                              domProps: { value: _vm.csrf }
+                            })
+                          ]
                         )
                       ]
                     : _vm._e()
@@ -72893,6 +72975,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Comment_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__Comment_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__modals_Login_vue__ = __webpack_require__(143);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__modals_Login_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__modals_Login_vue__);
+//
+//
 //
 //
 //
@@ -73690,6 +73774,11 @@ var render = function() {
                     _c("div", { staticClass: "card-content" }, [
                       _c("h4", {
                         staticClass: "is-size-4",
+                        domProps: { textContent: _vm._s(_vm.quiz.title) }
+                      }),
+                      _vm._v(" "),
+                      _c("h4", {
+                        staticClass: "is-size-4",
                         domProps: { textContent: _vm._s(_vm.quiz.question) }
                       }),
                       _vm._v(" "),
@@ -74178,6 +74267,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
@@ -74195,6 +74287,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             stage3: false,
             type: '',
             isFullPage: false,
+            quizTitle: '',
             questionValue: '',
             correctAnswer: '',
             falseOneValue: '',
@@ -74438,6 +74531,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     category_id: this.category,
                     youtube_id: this.videoID,
                     question: this.questionValue,
+                    title: this.quizTitle,
                     correct_answer: this.correctAnswer,
                     false_answer: this.falseOneValue,
                     false_answer_2: this.falseTwoValue,
@@ -74469,6 +74563,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     category_id: this.category,
                     youtube_id: this.videoID,
                     question: this.questionValue,
+                    title: this.quizTitle,
                     correct_answer: this.correctAnswer,
                     false_answer: this.falseOneValue,
                     false_answer_2: this.falseTwoValue,
@@ -74764,6 +74859,24 @@ var render = function() {
                 "div",
                 { staticStyle: { "margin-top": "1rem" } },
                 [
+                  _c(
+                    "b-field",
+                    { attrs: { label: "Title" } },
+                    [
+                      _c("b-input", {
+                        attrs: { placeholder: "Title" },
+                        model: {
+                          value: _vm.quizTitle,
+                          callback: function($$v) {
+                            _vm.quizTitle = $$v
+                          },
+                          expression: "quizTitle"
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
                   _c(
                     "b-field",
                     { attrs: { label: "Question to ask" } },

@@ -16,8 +16,8 @@ Route::post('/youtube/videos', 'YoutubeController@videos');
 
 
 Route::group(['middleware' => 'auth'], function() {
-    Route::post('/quizzes', 'QuizController@store');
-    Route::post('/quizzes/bulk', 'QuizController@storeBulk');
+    Route::post('/quizzes', 'QuizController@store')->middleware('confirmed');
+    Route::post('/quizzes/bulk', 'QuizController@storeBulk')->middleware('confirmed');
 
     Route::post('/polls/{quiz}', 'PollController@store');
 
@@ -49,8 +49,6 @@ Route::post('/register/username', 'Auth\RegisterController@checkUniqueUsername')
 Auth::routes();
 
 Route::get('/', 'HomeController@index')->name('home');
-Route::get('/sessionStatus', function () {
-    return ['user' => Auth::user() ? Auth::user() : null];
-});
+Route::get('/sessionStatus', 'HomeController@sessionStatus');
 
 Route::get('/{vue?}', 'HomeController@index')->where('vue', '[\/\w\.-]*');

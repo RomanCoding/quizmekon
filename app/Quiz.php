@@ -20,7 +20,8 @@ class Quiz extends Model
         'category_id',
         'user_id',
         'series_id',
-        'order'
+        'order',
+        'title'
     ];
 
     protected $hidden = ['correct_index'];

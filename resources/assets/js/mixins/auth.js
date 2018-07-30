@@ -6,6 +6,14 @@ let authMixin = {
                 axios.get('/sessionStatus')
                     .then(response => {
                         window.user = response.data.user;
+                        if (response.data.user && response.data.user.showFirstTime) {
+                            this.$toast.open({
+                                duration: 10000,
+                                message: "Welcome, please confirm your registration by acknowledging the email we have sent to " + response.data.user.email,
+                                position: 'is-top',
+                                type: 'is-danger'
+                            });
+                        }
                         resolve(response.data.user);
                     })
                     .catch(error => {

@@ -59,6 +59,9 @@
         </div>
 
         <div v-if="stage3" style="margin-top: 1rem;">
+            <b-field label="Title">
+                <b-input placeholder="Title" v-model="quizTitle"></b-input>
+            </b-field>
             <b-field label="Question to ask">
                 <b-input placeholder="Question" v-model="questionValue"></b-input>
             </b-field>
@@ -172,6 +175,7 @@
                 stage3: false,
                 type: '',
                 isFullPage: false,
+                quizTitle: '',
                 questionValue: '',
                 correctAnswer: '',
                 falseOneValue: '',
@@ -403,6 +407,7 @@
                         category_id: this.category,
                         youtube_id: this.videoID,
                         question: this.questionValue,
+                        title: this.quizTitle,
                         correct_answer: this.correctAnswer,
                         false_answer: this.falseOneValue,
                         false_answer_2: this.falseTwoValue,
@@ -434,6 +439,7 @@
                         category_id: this.category,
                         youtube_id: this.videoID,
                         question: this.questionValue,
+                        title: this.quizTitle,
                         correct_answer: this.correctAnswer,
                         false_answer: this.falseOneValue,
                         false_answer_2: this.falseTwoValue,

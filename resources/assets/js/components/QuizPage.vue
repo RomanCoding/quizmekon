@@ -25,10 +25,11 @@
                             </div>
                         </header>
                         <div class="card-content">
+                            <h4 class="is-size-4" v-text="quiz.title"></h4>
                             <h4 class="is-size-4" v-text="quiz.question"></h4>
                             <div class="media" v-if="showVideo">
-                                    <youtube :video-id="quiz.video.youtube_id" :player-vars="playerVars" @ended="ended"
-                                             ref="youtube" style="margin-top: 1rem;"/>
+                                <youtube :video-id="quiz.video.youtube_id" :player-vars="playerVars" @ended="ended"
+                                         ref="youtube" style="margin-top: 1rem;"/>
                             </div>
                             <div class="content" v-show="showQuiz">
                                 <template v-if="!quiz.usersPoll">
@@ -41,7 +42,8 @@
                                 </template>
                                 <template v-else>
                                     <div class="field" v-for="(a, key) in JSON.parse(quiz.answers)" v-if="showQuiz">
-                                        <b-radio :style="pollCss(key)" disabled v-model="quiz.usersPoll.index" :native-value="key" :type="pollStyle(key)">
+                                        <b-radio :style="pollCss(key)" disabled v-model="quiz.usersPoll.index"
+                                                 :native-value="key" :type="pollStyle(key)">
                                             {{ a }}
                                         </b-radio>
                                     </div>
@@ -179,7 +181,7 @@
             quizOrder: function (newVal, oldVal) {
                 this.stage = 1;
                 let self = this;
-                axios.get('/quizzes/' + this.series[newVal-1].id + '?single=1')
+                axios.get('/quizzes/' + this.series[newVal - 1].id + '?single=1')
                     .then((r) => {
                         self.quiz = r.data;
                     });

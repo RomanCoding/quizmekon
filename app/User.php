@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -17,6 +18,8 @@ class User extends Authenticatable
     protected $fillable = [
         'username', 'email', 'password', 'email_token'
     ];
+
+    protected $appends = ['showFirstTime'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -87,5 +90,10 @@ class User extends Authenticatable
     {
         $this->confirmed = 1;
         $this->save();
+    }
+
+    public function getShowFirstTimeAttribute()
+    {
+        return (!$this->confirmed && now()->diffInSeconds($this->created_at) < 30);
     }
 }

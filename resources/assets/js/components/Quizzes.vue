@@ -64,6 +64,7 @@
             this.changeSort(this.$route.params.sort || this.sort);
             this.loadMore();
             let self = this;
+
             $(window).on('scroll', function () {
                 if ($(window).scrollTop() > $(document).height() - $(window).height() - 1) {
                     self.loadMore();

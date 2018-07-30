@@ -27,6 +27,7 @@ class StoreQuiz extends FormRequest
             'end_time' => 'required|integer|gt:start_time|min:0',
             'youtube_id' => ['required', new YoutubeVideo],
             'question' => 'required|min:5|max:255',
+            'title' => 'required|min:4|max:255',
             'correct_answer' => 'required|min:3|max:255',
             'false_answer' => 'required|min:3|max:255',
             'false_answer_2' => 'required|min:3|max:255',

@@ -26,7 +26,17 @@
                         <a class="navbar-item" @click="toggleSignUpModal">Register</a>
                     </template>
                     <template v-else-if="this.$parent.$parent.user">
-                        {{ this.$parent.$parent.user.username }}
+                        <b-dropdown>
+                            <a class="navbar-item" slot="trigger">
+                                {{ this.$parent.$parent.user.username }}
+                                <b-icon icon="menu-down"></b-icon>
+                            </a>
+                            <b-dropdown-item title="Poll quizzes to get experience">Experience: {{ this.$parent.$parent.user.experience }}</b-dropdown-item>
+                            <b-dropdown-item @click="logout">Logout</b-dropdown-item>
+                        </b-dropdown>
+                        <form action="/logout" method="POST" style="display: none;" ref="logoutForm">
+                            <input type="hidden" name="_token" :value="csrf">
+                        </form>
                     </template>
                 </div>
             </div>
@@ -114,9 +124,6 @@
             toggleSignUpModal(event) {
                 event.preventDefault();
                 window.Event.$emit('signup-modal');
-            },
-            createPost() {
-                this.$router.push({path: '/submit'});
             },
             logout() {
                 this.$refs.logoutForm.submit();
