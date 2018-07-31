@@ -73777,10 +73777,12 @@ var render = function() {
                         domProps: { textContent: _vm._s(_vm.quiz.title) }
                       }),
                       _vm._v(" "),
-                      _c("h4", {
-                        staticClass: "is-size-4",
-                        domProps: { textContent: _vm._s(_vm.quiz.question) }
-                      }),
+                      _vm.showQuiz
+                        ? _c("h4", {
+                            staticClass: "is-size-4",
+                            domProps: { textContent: _vm._s(_vm.quiz.question) }
+                          })
+                        : _vm._e(),
                       _vm._v(" "),
                       _vm.showVideo
                         ? _c(

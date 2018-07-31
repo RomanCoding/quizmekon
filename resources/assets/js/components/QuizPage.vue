@@ -26,7 +26,7 @@
                         </header>
                         <div class="card-content">
                             <h4 class="is-size-4" v-text="quiz.title"></h4>
-                            <h4 class="is-size-4" v-text="quiz.question"></h4>
+                            <h4 class="is-size-4" v-text="quiz.question" v-if="showQuiz"></h4>
                             <div class="media" v-if="showVideo">
                                 <youtube :video-id="quiz.video.youtube_id" :player-vars="playerVars" @ended="ended"
                                          ref="youtube" style="margin-top: 1rem;"/>
